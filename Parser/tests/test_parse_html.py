@@ -103,3 +103,15 @@ class MultilevelParserTest(TestCase):
         self.assertEqual(len(self.parser.parsed_objects), 1)
         self.assertEqual(len(self.parser.parsed_objects[0].children), 1)
         self.assertEqual(self.parser.parsed_objects[0].children[0].tag, "link")
+
+    def test_parse_complex_html(self):
+        html = """
+        <h2 class="story-body__crosshead">Header</h2>
+        <p>content</p><p>content2</p>
+        <p>content3</p>
+        <p>content4</p>
+        <p>content5</p>
+        """
+        self.parser.parse(html)
+        self.assertEqual(len(self.parser.parsed_objects), 6)
+        self.assertEqual(self.parser.parsed_objects[0].tag, "header")

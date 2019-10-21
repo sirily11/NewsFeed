@@ -20,7 +20,22 @@ class BaseFeed:
 
     pass
 
-    async def fetch(self):
+    async def fetch(self, link: str) -> str:
+        """
+        Fetch individual page's content.
+        Override this to fetch the content of the news feed
+        :return:
+        """
+        pass
+
+    async def fetch_list(self):
+        """
+        Fetch list of news.
+        This will let the software to fetch list of news,
+        and then this will call fetch function to fetch
+        individual content
+        :return:
+        """
         pass
 
     async def upload(self):

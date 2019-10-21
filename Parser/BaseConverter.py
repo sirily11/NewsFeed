@@ -29,7 +29,7 @@ class BaseConverter:
                     parse_object.content = parse_object.content.replace(c.content, "")
             if parse_object.tag == "content":
                 ret_str += self.__convert_content__(parse_object)
-            elif parse_object.tag == "image":
+            elif parse_object.tag in ["image"]:
                 ret_str += self.__convert_image__(parse_object)
             elif parse_object.tag == "link":
                 parse_object: LinkObject
