@@ -1,10 +1,11 @@
-from Parser.ParsedObject import ParsedObject, LinkObject, ListElementObject
+from Parser.ParsedObject import ParsedObject, LinkObject, ListElementObject, HeaderObject
 from Parser.BaseConverter import BaseConverter
 from pyquery import PyQuery
+from typing import List
 
 
 class BaseParser:
-    parsed_objects: [ParsedObject]
+    parsed_objects: List[ParsedObject]
     converter: BaseConverter
 
     def __init__(self, converter: BaseConverter = BaseConverter()):
@@ -19,7 +20,7 @@ class BaseParser:
         """
         d = PyQuery(content)
         element_list = []
-        if d[0].tag != "div" or len(d.children()) == 0:
+        if len(d.children()) == 0:
             element_list.append(self.__parse__(d[0]))
         else:
             for child in d.children():
@@ -49,7 +50,7 @@ class BaseParser:
             return self.__parse_content___(child.text, children=children_list)
         elif "h" in child.tag:
             level = child.tag.replace("h", "")
-            return self.__parse_header__(content=child.text, level=level, children=children_list)
+            return self.__parse_header__(content=child.text, level=int(level), children=children_list)
         elif child.tag == "img":
             src = PyQuery(child).attr("src")
             return self.__parse_image__(src, children=children_list)
@@ -81,7 +82,7 @@ class BaseParser:
         Parse list.
         :return:
         """
-        return ListElementObject(tag="list", content=content, children=children)
+        return ListElementObject(content=content, children=children)
 
     @staticmethod
     def __parse_header__(content, level, children) -> ParsedObject:
@@ -90,8 +91,8 @@ class BaseParser:
         @:param level: indicate the header, h1, h2, or h3
         :return:
         """
-        return ParsedObject(tag=f"header-{level}", content=content, children=children)
+        return HeaderObject(content=content, children=children, level=level)
 
     @staticmethod
     def __parse_link__(content, link, children) -> ParsedObject:
-        return LinkObject(tag="link", content=content, link=link, children=children)
+        return LinkObject(content=content, link=link, children=children)
