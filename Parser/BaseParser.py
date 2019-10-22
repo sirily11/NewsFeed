@@ -1,5 +1,5 @@
 from Parser.ParsedObject import ParsedObject, LinkObject, ListElementObject, HeaderObject
-from Parser.BaseConverter import BaseConverter
+from Parser.BaseConverter import BaseConverter, PureTextConverter
 from pyquery import PyQuery
 from typing import List
 
@@ -23,8 +23,11 @@ class BaseParser:
         if len(d.children()) == 0:
             element_list.append(self.__parse__(d[0]))
         else:
-            for child in d.children():
-                element_list.append(self.__parse__(child))
+            children = d.children()
+            for child in children:
+                parsed = self.__parse__(child)
+                if parsed:
+                    element_list.append(parsed)
         self.parsed_objects = element_list
         return self
 
@@ -35,6 +38,10 @@ class BaseParser:
         """
         return self.converter.convert(self.parsed_objects)
 
+    def __str__(self):
+        # noinspection PyCallByClass
+        return PureTextConverter().convert(parse_objects=self.parsed_objects)
+
     def __parse__(self, child):
         """
         Parse object based on tag
@@ -44,13 +51,16 @@ class BaseParser:
         children = PyQuery(child).children()
         children_list = []
         for c in children:
-            children_list.append(self.__parse__(c))
+            parsed = self.__parse__(c)
+            if parsed:
+                children_list.append(parsed)
 
-        if child.tag in ["div", "p", "span", "label"]:
+        if child.tag in ["div", "p", "span", "label", "figure"]:
             return self.__parse_content___(child.text, children=children_list)
-        elif "h" in child.tag:
+        elif child.tag in ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']:
             level = child.tag.replace("h", "")
             return self.__parse_header__(content=child.text, level=int(level), children=children_list)
+
         elif child.tag == "img":
             src = PyQuery(child).attr("src")
             return self.__parse_image__(src, children=children_list)
@@ -58,7 +68,10 @@ class BaseParser:
             href = PyQuery(child).attr("href")
             return self.__parse_link__(content=child.text, link=href, children=children_list)
         elif child.tag in ['ol', 'ul', 'li']:
+
             return self.__parse_list___(content=child.text, children=children_list)
+        else:
+            return
 
     @staticmethod
     def __parse_image__(content, children) -> ParsedObject:

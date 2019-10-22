@@ -115,3 +115,34 @@ class MultilevelParserTest(TestCase):
         self.parser.parse(html)
         self.assertEqual(len(self.parser.parsed_objects), 6)
         self.assertEqual(self.parser.parsed_objects[0].tag, "header")
+
+    def test_complex_inline_link(self):
+        html = """
+        <div>
+            <ul class="story-body__unordered-list">
+                <li class="story-body__list-item"><a href="/d" class="story-body__link">a</a></li>
+                <li class="story-body__list-item"><a href="/b" class="story-body__link">b</a></li>
+                <li class="story-body__list-item"><a href="a" class="story-body__link">c</a></li>
+                <li class="story-body__list-item"><a href="/c" class="story-body__link">d</a></li>
+            </ul>
+        </div>
+        """
+        self.parser.parse(html)
+        self.assertEqual(len(self.parser.parsed_objects), 1)
+        self.assertEqual(self.parser.parsed_objects[0].tag, "list")
+        self.assertEqual(len(self.parser.parsed_objects[0].children), 4)
+
+    def test_complex_parse2(self):
+        html = """
+        <figure class="media-landscape no-caption full-width">
+            <span class="image-and-copyright-container">
+                <img src="https://ichef.bbci.co.uk/news/800/cpsprodpb/5761/production/_109296322_fe5be0ab-2efe-46a7-bca8-752af4a2a3bc.jpg" datasrc="https://ichef.bbci.co.uk/news/320/cpsprodpb/5761/production/_109296322_fe5be0ab-2efe-46a7-bca8-752af4a2a3bc.jpg" class="responsive-image__img js-image-replace" alt="约翰逊" width="1024" height="507" data-highest-encountered-width="800">
+                 <span class="story-image-copyright">UK Parliament/Jessica Talyor</span>
+            </span>
+        </figure>"""
+        self.parser.parse(html)
+        self.assertEqual(len(self.parser.parsed_objects), 1)
+        self.assertEqual(self.parser.parsed_objects[0].tag, "content")
+        self.assertEqual(len(self.parser.parsed_objects[0].children), 2)
+        self.assertEqual(self.parser.parsed_objects[0].children[0].tag, "image")
+

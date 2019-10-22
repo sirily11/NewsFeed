@@ -30,5 +30,5 @@ class HeaderObject(ParsedObject):
 
 class ListElementObject(ParsedObject):
 
-    def __init__(self, content, children=None):
+    def __init__(self, content="", children=None):
         super().__init__("list", content, children)

@@ -10,33 +10,33 @@ class BaseConvertTest(TestCase):
     def test_convert_content(self):
         objects = [ParsedObject(tag="content", content="Hello")]
         ret = self.converter.convert(objects)
-        self.assertEqual(ret, "Hello")
+        self.assertEqual(ret, "Hello\n")
 
     def test_convert_header(self):
         objects = [HeaderObject(content="Header2", level=2)]
         ret = self.converter.convert(objects)
-        self.assertEqual(ret, "\n##Header2\n")
+        self.assertEqual(ret, "\n## Header2\n")
 
     def test_convert_header2(self):
         objects = [HeaderObject(content="Header5", level=5)]
         ret = self.converter.convert(objects)
-        self.assertEqual(ret, "\n#####Header5\n")
+        self.assertEqual(ret, "\n##### Header5\n")
 
     def test_convert_link(self):
         objects = [LinkObject(content="Link", link="google.com")]
         ret = self.converter.convert(objects)
-        self.assertEqual(ret, "[Link](google.com)")
+        self.assertEqual(ret, "[Link](google.com) ")
 
     def test_convert_image(self):
         objects = [ParsedObject(content="abc", tag="image")]
         ret = self.converter.convert(objects)
-        self.assertEqual(ret, "![](abc)")
+        self.assertEqual(ret, "\n![](abc)\n\n")
 
     def test_convert_list(self):
         objects = [ListElementObject(content="", children=[ListElementObject(content="Hello"),
                                                            ListElementObject(content="Hello2")])]
         ret = self.converter.convert(objects)
-        self.assertEqual(ret, "\n- Hello\n- Hello2")
+        self.assertEqual(ret, "\n- Hello \n- Hello2 ")
 
 
 class MultiConvertTest(TestCase):
@@ -48,18 +48,12 @@ class MultiConvertTest(TestCase):
             ParsedObject(tag="content", content="Hello world",
                          children=[LinkObject(content="world", link="google.com")])]
         ret = self.converter.convert(objects)
-        self.assertEqual(ret, "Hello [world](google.com)")
+        self.assertEqual(ret, "Hello [world](google.com) \n")
 
     def test_convert_content2(self):
         objects = [
             ParsedObject(tag="content", content="Hello world",
                          children=[ParsedObject(content="world", tag="image")])]
         ret = self.converter.convert(objects)
-        self.assertEqual(ret, "Hello ![](world)")
+        self.assertEqual(ret, "Hello \n![](world)\n\n\n")
 
-    def test_convert_header(self):
-        objects = [
-            HeaderObject(content="Hello world", level=3,
-                         children=[ParsedObject(content="world", tag="image")])]
-        ret = self.converter.convert(objects)
-        self.assertEqual(ret, "\n###Hello ![](world)\n")
