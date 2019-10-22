@@ -17,10 +17,6 @@ class BBCChinese(BaseFeed):
         r = await session.get(link)
         body = r.html.find(".story-body__inner", first=True)
         if body:
-            contents = list(filter(lambda e: "function" not in e.text, body.find()))
-            content_list = ""
-            for c in contents:
-                content_list += c.html
             self.parser.parse(content=body.html)
             return self.parser.convert(), str(self.parser)
         else:
