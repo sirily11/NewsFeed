@@ -38,7 +38,6 @@ class BBCChinese(BaseFeed):
                     if "class" in c.attrs:
                         text_class = c.attrs['class']
                         if "js-delayed-image-load" in text_class and c.attrs['data-src'] not in images:
-                            print(c.attrs['data-src'])
                             images.append(c.attrs['data-src'])
                             html += f"<img src={c.attrs['data-src']} />"
                     else:
@@ -69,11 +68,12 @@ class BBCChinese(BaseFeed):
                 else:
                     image = image.attrs['data-src']
                 content, pure_text, cover = await self.fetch(link)
+                cover_2 = image.replace("/news/200/", "/news/800/")
                 news = BaseNews(title=title.text,
                                 link=links[i].absolute_links.pop(),
                                 content=content,
                                 pure_text=pure_text,
-                                cover=image.replace("/news/200/", "/news/800/"))
+                                cover=cover)
 
                 if news and news.title not in self.written_list:
                     news_list.append(news)
