@@ -17,11 +17,35 @@ class BBCChinese(BaseFeed):
             session = AsyncHTMLSession()
             r = await session.get(link)
             body = r.html.find(".story-body__inner", first=True)
-            if body:
-                self.parser.parse(content=body.html)
-                return self.parser.convert(), str(self.parser)
-            else:
-                return None, None
+            texts = []
+            images = []
+            html = ""
+            children = body.find()
+            first_line = body.find(".story-body__introduction", first=True)
+            cover = body.find(".js-image-replace", first=True)
+            # Get html
+            if cover:
+                html += cover.html
+            if first_line:
+                html += first_line.html
+                texts.append(first_line.text)
+
+            for c in children[1:]:
+                inner_text = c.text
+                if c.tag == "script":
+                    continue
+                if inner_text not in texts:
+                    if "class" in c.attrs:
+                        text_class = c.attrs['class']
+                        if "js-delayed-image-load" in text_class and c.attrs['data-src'] not in images:
+                            print(c.attrs['data-src'])
+                            images.append(c.attrs['data-src'])
+                            html += f"<img src={c.attrs['data-src']} />"
+                    else:
+                        texts.append(inner_text)
+                        html += c.html
+            self.parser.parse(content=html)
+            return self.parser.convert(), str(self.parser), cover.attrs['src']
         except Exception as e:
             # print(e)
             return None, None
@@ -44,7 +68,7 @@ class BBCChinese(BaseFeed):
                     image: str = image.attrs['src']
                 else:
                     image = image.attrs['data-src']
-                content, pure_text = await self.fetch(link)
+                content, pure_text, cover = await self.fetch(link)
                 news = BaseNews(title=title.text,
                                 link=links[i].absolute_links.pop(),
                                 content=content,
