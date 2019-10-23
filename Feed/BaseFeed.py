@@ -5,6 +5,7 @@ import requests
 import asyncio
 import json
 from Sentiment.Sentiment import Sentiment
+from Feed.key import username, password
 
 
 class BaseFeed:
@@ -17,8 +18,7 @@ class BaseFeed:
     def __init__(self, parser=BaseParser()):
         """
         News feed object. Fetch news from internet and then post the data to database
-        :param publisher:
-        :param parser:
+        :param parser: HTML Parser. Default is base parser.
         """
         self.parser = parser
         self.news: list[BaseNews] = []
@@ -50,7 +50,14 @@ class BaseFeed:
         """
         raise NotImplementedError
 
-    async def upload_item(self, obj: BaseNews, url, header):
+    async def upload_item(self, obj: BaseNews, url: str, header):
+        """
+        Upload single Item
+        :param obj: Upload object
+        :param url: Upload URL
+        :param header: Auth Header. Use this to login the system
+        :return:
+        """
         submit_object = obj.to_json()
         submit_object['publisher'] = self.news_publisher
         res = requests.post(url, json=submit_object, headers=header)
@@ -71,10 +78,9 @@ class BaseFeed:
                 n = self.news[i]
                 n.sentiment = s['score']
 
-        url = "http://0.0.0.0:8080/news-feed/news/"
-        username = "test"
-        password = "thisispassword"
-        auth = requests.post("http://0.0.0.0:8080/api/token/", {"username": username, "password": password})
+        url = "https://toebpt5v9j.execute-api.us-east-1.amazonaws.com/dev/news-feed/news/"
+        auth = requests.post("https://toebpt5v9j.execute-api.us-east-1.amazonaws.com/dev/api/token/",
+                             {"username": username, "password": password})
         await asyncio.sleep(2)
         hed = {'Authorization': 'Bearer ' + auth.json()['access']}
         res = await asyncio.gather(*(self.upload_item(obj=n, url=url, header=hed) for n in self.news))
