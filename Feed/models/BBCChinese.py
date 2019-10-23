@@ -13,13 +13,17 @@ class BBCChinese(BaseFeed):
         self.news_publisher = 1
 
     async def fetch(self, link: str) -> Optional[Tuple]:
-        session = AsyncHTMLSession()
-        r = await session.get(link)
-        body = r.html.find(".story-body__inner", first=True)
-        if body:
-            self.parser.parse(content=body.html)
-            return self.parser.convert(), str(self.parser)
-        else:
+        try:
+            session = AsyncHTMLSession()
+            r = await session.get(link)
+            body = r.html.find(".story-body__inner", first=True)
+            if body:
+                self.parser.parse(content=body.html)
+                return self.parser.convert(), str(self.parser)
+            else:
+                return None, None
+        except Exception as e:
+            # print(e)
             return None, None
 
     async def fetch_list(self):
@@ -51,7 +55,8 @@ class BBCChinese(BaseFeed):
                     news_list.append(news)
                     self.written_list.append(news.title)
                 else:
-                    print("Skip title", title.text)
+                    # print("Skip title", title.text)
+                    pass
             except Exception as e:
                 print(e)
         self.news = news_list

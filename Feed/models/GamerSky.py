@@ -38,7 +38,7 @@ class GamerSky(BaseFeed):
             self.parser.parse(content)
             return self.parser.convert(), str(self.parser)
         except Exception as e:
-            print(e)
+            # print(e)
             return None, None
 
     async def fetch_list(self):
