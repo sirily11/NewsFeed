@@ -25,12 +25,15 @@ class BaseConverter:
         for parse_object in parse_objects:
             if not parse_object:
                 return ""
+
             if parse_object.children:
                 for c in parse_object.children:
                     if c:
                         parse_object.content: str
                         if type(c.content) is str and type(parse_object.content) is str:
                             parse_object.content = parse_object.content.replace(c.content, "")
+            if not parse_object.content:
+                parse_object.content = ""
 
             if parse_object.tag == "content":
                 ret_str += self.__convert_content__(parse_object)

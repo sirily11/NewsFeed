@@ -1,5 +1,5 @@
 class BaseNews:
-    def __init__(self, title: str, link: str, cover: str, content="", pure_text=""):
+    def __init__(self, title: str, link: str, cover: str = None, content="", pure_text=""):
         self.title = title
         self.link = link
         self.cover = cover

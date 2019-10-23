@@ -1,6 +1,6 @@
 from Feed.BaseNews import BaseNews
 from Parser.BaseParser import BaseParser
-from typing import List
+from typing import List, Optional, Tuple
 import requests
 import asyncio
 import json
@@ -32,11 +32,11 @@ class BaseFeed:
         except FileNotFoundError as e:
             print(e)
 
-    async def fetch(self, link: str) -> str:
+    async def fetch(self, link: str) -> Optional[Tuple]:
         """
         Fetch individual page's content.
         Override this to fetch the content of the news feed
-        :return:
+        :return: News content (parsed), pure text version's content
         """
         raise NotImplementedError
 

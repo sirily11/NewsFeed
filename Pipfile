@@ -10,9 +10,7 @@ pytest = "*"
 requests-html = "*"
 coverage = "*"
 requests = "*"
-selectolax = "*"
 pyquery = "*"
-selenium = "*"
 
 [requires]
 python_version = "3.7"

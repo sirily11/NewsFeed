@@ -4,6 +4,7 @@ from typing import List, Optional, Any, Union, Tuple
 from requests_html import AsyncHTMLSession, HTMLResponse, HTMLSession
 import asyncio
 import json
+from tqdm import tqdm
 
 
 class BBCChinese(BaseFeed):
@@ -12,7 +13,6 @@ class BBCChinese(BaseFeed):
         self.news_publisher = 1
 
     async def fetch(self, link: str) -> Optional[Tuple]:
-        print("Fetching", link)
         session = AsyncHTMLSession()
         r = await session.get(link)
         body = r.html.find(".story-body__inner", first=True)
@@ -32,7 +32,7 @@ class BBCChinese(BaseFeed):
         images += r.html.find(".js-delayed-image-load")
         news_list: List[BaseNews] = []
 
-        for i, image in enumerate(images):
+        for i, image in enumerate(tqdm(images, desc="BBC Chinese")):
             try:
                 link = links[i].absolute_links.pop()
                 title = titles[i]
@@ -64,6 +64,3 @@ async def main():
     bbc = BBCChinese()
     await bbc.fetch_list()
     await bbc.upload()
-
-
-asyncio.run(main())
