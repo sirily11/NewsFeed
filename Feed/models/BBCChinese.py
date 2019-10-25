@@ -17,6 +17,11 @@ class BBCChinese(BaseFeed):
             session = AsyncHTMLSession()
             r = await session.get(link)
             body = r.html.find(".story-body__inner", first=True)
+            if not body:
+                body = r.html.find(".story-body", first=True)
+                self.parser.parse(body.html)
+                return self.parser.convert(), str(self.parser), None
+
             texts = []
             images = []
             html = ""
@@ -44,10 +49,13 @@ class BBCChinese(BaseFeed):
                         texts.append(inner_text)
                         html += c.html
             self.parser.parse(content=html)
-            return self.parser.convert(), str(self.parser), cover.attrs['src']
+            if cover:
+                return self.parser.convert(), str(self.parser), cover.attrs['src']
+            else:
+                return self.parser.convert(), str(self.parser), None
         except Exception as e:
-            # print(e)
-            return None, None
+            print(e)
+            return None, None, None
 
     async def fetch_list(self):
         session = AsyncHTMLSession()
@@ -69,6 +77,8 @@ class BBCChinese(BaseFeed):
                     image = image.attrs['data-src']
                 content, pure_text, cover = await self.fetch(link)
                 cover_2 = image.replace("/news/200/", "/news/800/")
+                if not cover:
+                    cover = cover_2
                 news = BaseNews(title=title.text,
                                 link=links[i].absolute_links.pop(),
                                 content=content,
@@ -91,5 +101,9 @@ class BBCChinese(BaseFeed):
 
 async def main():
     bbc = BBCChinese()
+    # await bbc.fetch("https://www.bbc.com/zhongwen/simp/world-50176209")
     await bbc.fetch_list()
     await bbc.upload()
+
+
+
