@@ -70,18 +70,21 @@ class BaseFeed:
         Upload Fetched data
         """
         # get sentiments for news
-        pure_texts = [n.pure_text for n in self.news if n.pure_text != ""]
-        if len(pure_texts) > 0:
-            sentiments = Sentiment(pure_texts).analyze()
-            for s in sentiments:
-                i = int(s['id'])
-                n = self.news[i]
-                n.sentiment = s['score']
-
-        url = "https://toebpt5v9j.execute-api.us-east-1.amazonaws.com/dev/news-feed/news/"
-        auth = requests.post("https://toebpt5v9j.execute-api.us-east-1.amazonaws.com/dev/api/token/",
-                             {"username": username, "password": password})
-        await asyncio.sleep(2)
-        hed = {'Authorization': 'Bearer ' + auth.json()['access']}
-        res = await asyncio.gather(*(self.upload_item(obj=n, url=url, header=hed) for n in self.news))
-        return res
+        # pure_texts = [n.pure_text for n in self.news if n.pure_text != ""]
+        # if len(pure_texts) > 0:
+        #     sentiments = Sentiment(pure_texts).analyze()
+        #     if sentiments:
+        #         for s in sentiments:
+        #             i = int(s['id'])
+        #             n = self.news[i]
+        #             n.sentiment = s['score']
+        try:
+            url = "https://toebpt5v9j.execute-api.us-east-1.amazonaws.com/dev/news-feed/news/"
+            auth = requests.post("https://toebpt5v9j.execute-api.us-east-1.amazonaws.com/dev/api/token/",
+                                 {"username": username, "password": password})
+            await asyncio.sleep(2)
+            hed = {'Authorization': 'Bearer ' + auth.json()['access']}
+            res = await asyncio.gather(*(self.upload_item(obj=n, url=url, header=hed) for n in self.news))
+            return res
+        except Exception as e:
+            print(e)
