@@ -12,6 +12,7 @@ class YahooHK(BaseFeed):
     def __init__(self):
         super().__init__()
         self.news_publisher = 6
+        self.__init_written_list__()
 
     async def fetch(self, link: str) -> Optional[Tuple]:
         try:
@@ -37,7 +38,7 @@ class YahooHK(BaseFeed):
             print(e)
             return None, None, None
 
-    async def fetch_list(self):
+    async def fetch_list(self) -> List[Tuple[str, str, Optional[str]]]:
         try:
             session = AsyncHTMLSession()
             r: HTMLResponse = await session.get("https://hk.news.yahoo.com/")
@@ -50,28 +51,16 @@ class YahooHK(BaseFeed):
                 if not ad:
                     title = ele.find("h3", first=True).text
                     link = ele.find("a", first=True).absolute_links.pop()
-                    content, pure_text, cover = await self.fetch(link)
-                    news = BaseNews(title=HanziConv.toSimplified(title),
-                                    link=link,
-                                    content=content,
-                                    pure_text=pure_text,
-                                    cover=cover)
-                    if news and news.title not in self.written_list:
-                        news_list.append(news)
-                        self.written_list.append(news.title)
-            self.news = news_list
-            # write news title to a local file
-            with open("written.json", 'w') as f:
-                json.dump(self.written_list, f, ensure_ascii=False)
+                    news_list.append((title, link, None))
+
+            return news_list
         except Exception as e:
             print(e)
 
 
 async def main():
     bbc = YahooHK()
-    # markdown, _, c = await bbc.fetch(
-    #     "https://hk.news.yahoo.com/%E9%99%B3%E5%90%8C%E4%BD%B3%E6%A1%88%E5%8F%B0%E6%B8%AF%E6%8B%89%E9%8B%B8-214500916.html")
-    await bbc.fetch_list()
+    await bbc.fetch_feed()
     await bbc.upload()
 
 

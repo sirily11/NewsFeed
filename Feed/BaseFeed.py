@@ -5,6 +5,7 @@ import requests
 import asyncio
 import json
 from Sentiment.Sentiment import Sentiment
+from tqdm import tqdm
 from Feed.key import username, password
 
 
@@ -22,10 +23,17 @@ class BaseFeed:
         """
         self.parser = parser
         self.news: list[BaseNews] = []
-        self.news_publisher = None
-        self.written_list = []
+        self.news_publisher: int = None
+        self.written_list: List = []
+        self.display_name = ""
+
+    def __init_written_list__(self):
+        """
+        Init the written list
+        :return:
+        """
         try:
-            with open("written.json", "r") as f:
+            with open(f"written-{self.news_publisher}.json", "r") as f:
                 data = f.read()
                 if data != '':
                     self.written_list = json.loads(data)
@@ -36,19 +44,38 @@ class BaseFeed:
         """
         Fetch individual page's content.
         Override this to fetch the content of the news feed
-        :return: News content (parsed), pure text version's content
+        :return: News content (parsed), pure text version's content, cover
         """
         raise NotImplementedError
 
-    async def fetch_list(self):
+    async def fetch_list(self) -> List[Tuple[str, str, Optional[str]]]:
         """
         Fetch list of news.
         This will let the software to fetch list of news,
         and then this will call fetch function to fetch
         individual content
-        :return:
+        :return: List( title, link, cover)
         """
         raise NotImplementedError
+
+    async def fetch_feed(self):
+        """
+        Use fetched titles, links, covers to do the
+        individual page fetching.
+        If cover is None, then using fetch to fetch cover.
+        Call this method for fetching
+        :return:
+        """
+        news_list = await self.fetch_list()
+        for news in tqdm(news_list, desc=self.display_name):
+            title, link, cover = news
+            if not cover:
+                content, pure_text, cover = await self.fetch(link=link)
+            else:
+                content, pure_text, _ = await self.fetch(link)
+            news_feed = BaseNews(title=title, link=link, cover=cover, content=content, pure_text=pure_text)
+            if news_feed and news_feed.link not in self.written_list:
+                self.news.append(news_feed)
 
     async def upload_item(self, obj: BaseNews, url: str, header):
         """
@@ -64,6 +91,7 @@ class BaseFeed:
         if res.status_code != 201:
             print(res.json())
         await asyncio.sleep(1)
+        self.written_list.append(obj.link)
 
     async def upload(self):
         """"
@@ -79,12 +107,14 @@ class BaseFeed:
         #             n = self.news[i]
         #             n.sentiment = s['score']
         try:
-            url = "https://toebpt5v9j.execute-api.us-east-1.amazonaws.com/dev/news-feed/news/"
-            auth = requests.post("https://toebpt5v9j.execute-api.us-east-1.amazonaws.com/dev/api/token/",
+            url = "https://812h5181yb.execute-api.us-east-1.amazonaws.com/dev/news-feed/news/"
+            auth = requests.post("https://812h5181yb.execute-api.us-east-1.amazonaws.com/dev/api/token/",
                                  {"username": username, "password": password})
             await asyncio.sleep(2)
             hed = {'Authorization': 'Bearer ' + auth.json()['access']}
             res = await asyncio.gather(*(self.upload_item(obj=n, url=url, header=hed) for n in self.news))
+            with open(f"written-{self.news_publisher}.json", 'w') as f:
+                json.dump(self.written_list, f, ensure_ascii=False)
             return res
         except Exception as e:
             print(e)

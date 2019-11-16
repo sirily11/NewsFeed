@@ -17,6 +17,7 @@ class GNNNews(BaseFeed):
     def __init__(self):
         super().__init__()
         self.news_publisher = 7
+        self.__init_written_list__()
 
     async def fetch(self, link: str) -> Optional[Tuple]:
         try:
@@ -51,7 +52,7 @@ class GNNNews(BaseFeed):
             print(e)
             return None, None, None
 
-    async def fetch_list(self):
+    async def fetch_list(self) -> List[Tuple[str, str, Optional[str]]]:
         try:
             session = AsyncHTMLSession()
             r: HTMLResponse = await session.get("https://gnn.gamer.com.tw")
@@ -59,31 +60,20 @@ class GNNNews(BaseFeed):
             container = r.html.find(".BH-lbox", first=True)
             elements = container.find("h1")
 
-            for e in tqdm(elements, desc="GNN News"):
-                title = e.text
+            for e in elements:
+                title = HanziConv.toSimplified(e.text)
                 link = e.absolute_links.pop()
-                content, pure_text, cover = await self.fetch(link)
+                news_list.append((title, link, None))
 
-                news = BaseNews(title=HanziConv.toSimplified(title),
-                                link=link,
-                                content=content,
-                                pure_text=pure_text,
-                                cover=cover)
-                if news and news.title not in self.written_list:
-                    news_list.append(news)
-                    self.written_list.append(news.title)
-            self.news = news_list
-            # write news title to a local file
-            with open("written.json", 'w') as f:
-                json.dump(self.written_list, f, ensure_ascii=False)
+            return news_list
+
         except Exception as e:
             print(e)
 
 
 async def main():
     gnn = GNNNews()
-    # content, _, cover = await gnn.fetch("https://gnn.gamer.com.tw/detail.php?sn=188098")
-    await gnn.fetch_list()
+    await gnn.fetch_feed()
     await gnn.upload()
 
 

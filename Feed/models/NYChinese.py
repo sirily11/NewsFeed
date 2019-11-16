@@ -11,6 +11,7 @@ class NYChinese(BaseFeed):
     def __init__(self):
         super().__init__()
         self.news_publisher = 4
+        self.__init_written_list__()
 
     async def fetch(self, link: str) -> Optional[Tuple]:
         try:
@@ -25,12 +26,11 @@ class NYChinese(BaseFeed):
                 content += c.html
             self.parser.parse(content)
             return self.parser.convert(), str(self.parser), cover
-
         except Exception as e:
             # print(e)
             return None, None, None
 
-    async def fetch_list(self):
+    async def fetch_list(self) -> List[Tuple[str, str, Optional[str]]]:
         url = "https://cn.nytimes.com/"
         session = AsyncHTMLSession()
         r = await session.get(url)
@@ -47,26 +47,14 @@ class NYChinese(BaseFeed):
                 n_links.append(li)
 
         # Parse each
-        for i, title in enumerate(tqdm(n_titles, desc="NY Chinese")):
+        for i, title in enumerate(n_titles):
             link = n_links[i]
-            content, pure_text, cover = await self.fetch(link=link)
-            if content:
-                news = BaseNews(title=title,
-                                link=link,
-                                content=content,
-                                pure_text=pure_text,
-                                cover=cover
-                                )
-                if news and news.title not in self.written_list:
-                    news_list.append(news)
-                    self.written_list.append(news.title)
-        self.news = news_list
-        with open("written.json", 'w') as f:
-            json.dump(self.written_list, f, ensure_ascii=False)
+            news_list.append((title, link, None))
+
+        return news_list
 
 
 async def main():
-    bbc = NYChinese()
-    await bbc.fetch_list()
-    await bbc.upload()
-
+    nyc = NYChinese()
+    await nyc.fetch_feed()
+    await nyc.upload()

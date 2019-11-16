@@ -12,6 +12,7 @@ coverage = "*"
 requests = "*"
 pyquery = "*"
 hanziconv = "*"
+pytest-asyncio = "*"
 
 [requires]
 python_version = "3.7"

@@ -1,8 +1,7 @@
 import asyncio
-
 from Feed.BaseFeed import BaseFeed
 from requests_html import AsyncHTMLSession
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 import json
 from Feed.BaseNews import BaseNews
 from tqdm import tqdm, trange
@@ -36,10 +35,10 @@ class GamerSky(BaseFeed):
                         content += c.html
                         texts.append(c.text)
             self.parser.parse(content)
-            return self.parser.convert(), str(self.parser)
+            return self.parser.convert(), str(self.parser), None
         except Exception as e:
             # print(e)
-            return None, None
+            return None, None, None
 
     async def fetch_list(self):
         url = "https://www.gamersky.com/"
@@ -57,29 +56,17 @@ class GamerSky(BaseFeed):
                 if row.text != "":
                     titles.append(row.text)
                     links.append(row.attrs['href'])
-        news_list = []
+        news_list: List[Tuple[str, str, Optional[str]]] = []
 
-        for i, t in enumerate(tqdm(titles, desc="Gamersky")):
-            print(f"{i}/{len(titles)}")
-            link = links[i]
-            content, pure_text = await self.fetch(link=link)
-            if content:
-                news = BaseNews(title=t,
-                                link=link,
-                                content=content,
-                                pure_text=pure_text,
-                                )
-                if news and news.title not in self.written_list:
-                    news_list.append(news)
-                    self.written_list.append(news.title)
-        self.news = news_list
-        with open("written.json", 'w') as f:
-            json.dump(self.written_list, f, ensure_ascii=False)
+        for i, t in enumerate(titles):
+            link: str = links[i]
+            t: str
+            news_list.append((t, link, None))
+
+        return news_list
 
 
 async def main():
     gamer = GamerSky()
-    await gamer.fetch_list()
+    await gamer.fetch_feed()
     await gamer.upload()
-
-

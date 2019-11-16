@@ -55,7 +55,7 @@ class BaseParser:
             if parsed:
                 children_list.append(parsed)
 
-        if child.tag in ["div", "p", "span", "label", "figure"]:
+        if child.tag in ["div", "p", "span", "label", "figure", "em"]:
             return self.__parse_content___(child.text, children=children_list)
         elif child.tag in ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']:
             level = child.tag.replace("h", "")
