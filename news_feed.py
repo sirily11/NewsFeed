@@ -1,4 +1,4 @@
-from Feed.models import BBCChinese, BBCChinese, NYChinese, YahooHK, GNNNews, Theverge
+from Feed.models import BBCChinese, GamerSky, NYChinese, YahooHK, GNNNews, Theverge
 import time
 import asyncio
 import datetime
@@ -9,7 +9,7 @@ async def main():
     while True:
         last_updated = 0
         bbc = BBCChinese.main()
-        gamer = BBCChinese.main()
+        gamer = GamerSky.main()
         nyc = NYChinese.main()
         yahooHK = YahooHK.main()
         gnn = GNNNews.main()

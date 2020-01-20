@@ -16,6 +16,7 @@ class TheVerge(BaseFeed):
     def __init__(self):
         super().__init__()
         self.news_publisher = 8
+        self.display_name = "The Verge"
         self.__init_written_list__()
 
     async def fetch(self, link: str) -> Optional[Tuple]:
@@ -53,7 +54,7 @@ class TheVerge(BaseFeed):
             self.parser.parse(content=html)
             return self.parser.convert(), str(self.parser), cover
         except Exception as e:
-            print(e)
+            # print(e)
             return None, None, None
 
     async def fetch_list(self) -> List[Tuple[str, str, Optional[str]]]:

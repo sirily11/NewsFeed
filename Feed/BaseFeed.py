@@ -5,8 +5,11 @@ import requests
 import asyncio
 import json
 from Sentiment.Sentiment import Sentiment
+from Feed.stopwords import stop_words
 from tqdm import tqdm
 from Feed.key import username, password
+import jieba
+import collections
 
 
 class BaseFeed:
@@ -73,9 +76,36 @@ class BaseFeed:
                 content, pure_text, cover = await self.fetch(link=link)
             else:
                 content, pure_text, _ = await self.fetch(link)
-            news_feed = BaseNews(title=title, link=link, cover=cover, content=content, pure_text=pure_text)
-            if news_feed and news_feed.link not in self.written_list:
-                self.news.append(news_feed)
+            if content:
+                news_feed = BaseNews(title=title, link=link, cover=cover, content=content, pure_text=pure_text)
+                if news_feed and news_feed.link not in self.written_list:
+                    self.news.append(news_feed)
+
+    async def upload_keyword(self, pure_text: str, obj_id: int):
+        """
+        Upload keyword
+        :param pure_text: Text
+        :param obj_id: News's id
+        :return:
+        """
+        words = jieba.lcut(pure_text)
+        url = "https://qbiv28lfa0.execute-api.us-east-1.amazonaws.com/dev/news-feed/keyword/"
+        keywords = []
+        for w in words:
+            if w in stop_words:
+                continue
+            if w == "" or w == " " or w == "\n":
+                continue
+            if len(w) > 2 and w != '”':
+                keywords.append(w)
+
+        dup = [(k, count) for k, count, in collections.Counter(keywords).items() if count > 1]
+        dup.sort(key=lambda tup: tup[1], reverse=True)
+        data = [{"feed": obj_id, "keyword": k} for k, c in dup]
+        res = requests.post(url, json=data[:5])
+        if res.status_code != 201:
+            print(res.json())
+        await asyncio.sleep(1)
 
     async def upload_item(self, obj: BaseNews, url: str, header):
         """
@@ -88,10 +118,12 @@ class BaseFeed:
         submit_object = obj.to_json()
         submit_object['publisher'] = self.news_publisher
         res = requests.post(url, json=submit_object, headers=header)
-        if res.status_code != 201:
-            print(res.json())
         await asyncio.sleep(1)
         self.written_list.append(obj.link)
+        if res.status_code != 201:
+            print(res.json())
+            return
+        await self.upload_keyword(obj.pure_text, res.json()['id'])
 
     async def upload(self):
         """"
@@ -107,8 +139,8 @@ class BaseFeed:
         #             n = self.news[i]
         #             n.sentiment = s['score']
         try:
-            url = "https://812h5181yb.execute-api.us-east-1.amazonaws.com/dev/news-feed/news/"
-            auth = requests.post("https://812h5181yb.execute-api.us-east-1.amazonaws.com/dev/api/token/",
+            url = "https://qbiv28lfa0.execute-api.us-east-1.amazonaws.com/dev/news-feed/news/"
+            auth = requests.post("https://qbiv28lfa0.execute-api.us-east-1.amazonaws.com/dev/api/token/",
                                  {"username": username, "password": password})
             await asyncio.sleep(2)
             hed = {'Authorization': 'Bearer ' + auth.json()['access']}

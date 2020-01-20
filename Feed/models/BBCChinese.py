@@ -1,8 +1,8 @@
 from Feed.BaseFeed import BaseFeed
 from typing import List, Optional, Any, Union, Tuple
 from requests_html import AsyncHTMLSession, HTMLResponse, HTMLSession
-from tqdm import tqdm
 import asyncio
+
 
 class BBCChinese(BaseFeed):
     def __init__(self):
@@ -53,7 +53,7 @@ class BBCChinese(BaseFeed):
             else:
                 return self.parser.convert(), str(self.parser), None
         except Exception as e:
-            print(e)
+            # print(e)
             return None, None, None
 
     async def fetch_list(self) -> List[Tuple[str, str, str]]:
@@ -82,8 +82,7 @@ class BBCChinese(BaseFeed):
 async def main():
     bbc = BBCChinese()
     await bbc.fetch_feed()
-    print(bbc.news[0])
-    # await bbc.upload()
+    await bbc.upload()
 
 
 if __name__ == '__main__':

@@ -11,6 +11,7 @@ class NYChinese(BaseFeed):
     def __init__(self):
         super().__init__()
         self.news_publisher = 4
+        self.display_name = "NY Chinese"
         self.__init_written_list__()
 
     async def fetch(self, link: str) -> Optional[Tuple]:

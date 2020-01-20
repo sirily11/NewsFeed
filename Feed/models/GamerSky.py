@@ -12,6 +12,8 @@ class GamerSky(BaseFeed):
     def __init__(self):
         super().__init__()
         self.news_publisher = 3
+        self.display_name = "GamerSky"
+        self.__init_written_list__()
 
     async def fetch(self, link: str) -> Optional[Tuple]:
         try:
@@ -37,7 +39,6 @@ class GamerSky(BaseFeed):
             self.parser.parse(content)
             return self.parser.convert(), str(self.parser), None
         except Exception as e:
-            # print(e)
             return None, None, None
 
     async def fetch_list(self):
@@ -70,3 +71,7 @@ async def main():
     gamer = GamerSky()
     await gamer.fetch_feed()
     await gamer.upload()
+
+
+if __name__ == '__main__':
+    asyncio.run(main())

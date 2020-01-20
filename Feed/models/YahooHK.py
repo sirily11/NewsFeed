@@ -12,6 +12,7 @@ class YahooHK(BaseFeed):
     def __init__(self):
         super().__init__()
         self.news_publisher = 6
+        self.display_name = "Yahoo HK"
         self.__init_written_list__()
 
     async def fetch(self, link: str) -> Optional[Tuple]:
@@ -33,7 +34,7 @@ class YahooHK(BaseFeed):
                 if e.tag == "p":
                     html += f"<p>{e.text}</p>"
             self.parser.parse(html)
-            return HanziConv.toSimplified(self.parser.convert()), str(self.parser), cover
+            return HanziConv.toSimplified(self.parser.convert()), HanziConv.toSimplified(str(self.parser)), cover
         except Exception as e:
             print(e)
             return None, None, None
@@ -45,17 +46,18 @@ class YahooHK(BaseFeed):
             news_list = []
             list_elem = r.html.find(".js-stream-content")
 
-            for ele in tqdm(list_elem, desc="Yahoo News"):
+            for ele in list_elem:
                 ad = ele.find(".Feedback", first=True)
                 # Only get content if it is not ad
                 if not ad:
                     title = ele.find("h3", first=True).text
                     link = ele.find("a", first=True).absolute_links.pop()
-                    news_list.append((title, link, None))
+                    news_list.append((HanziConv.toSimplified(title), link, None))
 
             return news_list
         except Exception as e:
-            print(e)
+            # print(e)
+            e
 
 
 async def main():

@@ -17,6 +17,7 @@ class GNNNews(BaseFeed):
     def __init__(self):
         super().__init__()
         self.news_publisher = 7
+        self.display_name = "GNN News"
         self.__init_written_list__()
 
     async def fetch(self, link: str) -> Optional[Tuple]:
@@ -49,7 +50,7 @@ class GNNNews(BaseFeed):
             self.parser.parse(f"<div>{html}</div>")
             return HanziConv.toSimplified(self.parser.convert()), str(self.parser), cover
         except Exception as e:
-            print(e)
+            # print(e)
             return None, None, None
 
     async def fetch_list(self) -> List[Tuple[str, str, Optional[str]]]:
@@ -68,7 +69,8 @@ class GNNNews(BaseFeed):
             return news_list
 
         except Exception as e:
-            print(e)
+            # print(e)
+            e
 
 
 async def main():
