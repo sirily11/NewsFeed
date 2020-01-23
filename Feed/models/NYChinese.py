@@ -19,7 +19,8 @@ class NYChinese(BaseFeed):
             # Will return cover from this function. Markdown, pure text, cover
             session = AsyncHTMLSession()
             r = await session.get(link)
-            cover = r.html.find(".article-span-photo", first=True).find("img", first=True).attrs['src']
+            cover = r.html.find(".article-span-photo",
+                                first=True).find("img", first=True).attrs['src']
             body = r.html.find(".article-body", first=True)
             contents = body.find(".article-paragraph")
             content = ""
@@ -35,7 +36,7 @@ class NYChinese(BaseFeed):
         url = "https://cn.nytimes.com/"
         session = AsyncHTMLSession()
         r = await session.get(url)
-        container = r.html.find("#regularHomepage", first=True)
+        container = r.html.find("body", first=True)
         titles = container.find("h3")
         n_links = []
         n_titles = []
@@ -56,6 +57,9 @@ class NYChinese(BaseFeed):
 
 
 async def main():
-    nyc = NYChinese()
-    await nyc.fetch_feed()
-    await nyc.upload()
+    try:
+        nyc = NYChinese()
+        await nyc.fetch_feed()
+        await nyc.upload()
+    except Exception as e:
+        print(e)

@@ -68,9 +68,12 @@ class GamerSky(BaseFeed):
 
 
 async def main():
-    gamer = GamerSky()
-    await gamer.fetch_feed()
-    await gamer.upload()
+    try:
+        gamer = GamerSky()
+        await gamer.fetch_feed()
+        await gamer.upload()
+    except Exception as e:
+        print(e)
 
 
 if __name__ == '__main__':

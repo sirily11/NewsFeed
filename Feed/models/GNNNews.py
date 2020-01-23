@@ -28,11 +28,13 @@ class GNNNews(BaseFeed):
             image_container = container.find(".GN-thumbnail", first=True)
             cover = None
             if image_container:
-                cover = image_container.find("img", first=True).attrs['data-src']
+                cover = image_container.find(
+                    "img", first=True).attrs['data-src']
 
             html = ""
             elements = container.find("div")
             images = []
+            textStr = ""
 
             for element in elements:
                 image = element.find(".GN-thumbnails", first=True)
@@ -46,7 +48,9 @@ class GNNNews(BaseFeed):
                     continue
                 else:
                     text = element.text
-                    html += f"<div>{text}</div>"
+                    if text not in textStr:
+                        textStr += text
+                        html += f"<div>{text}</div>"
             self.parser.parse(f"<div>{html}</div>")
             return HanziConv.toSimplified(self.parser.convert()), str(self.parser), cover
         except Exception as e:
@@ -74,9 +78,12 @@ class GNNNews(BaseFeed):
 
 
 async def main():
-    gnn = GNNNews()
-    await gnn.fetch_feed()
-    await gnn.upload()
+    try:
+        gnn = GNNNews()
+        await gnn.fetch_feed()
+        await gnn.upload()
+    except Exception as e:
+        print(e)
 
 
 if __name__ == '__main__':

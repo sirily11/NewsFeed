@@ -59,7 +59,8 @@ class BBCChinese(BaseFeed):
     async def fetch_list(self) -> List[Tuple[str, str, str]]:
         session = AsyncHTMLSession()
         r: HTMLResponse = await session.get("https://www.bbc.com/zhongwen/simp")
-        images = [r.html.find(".buzzard__image", first=True).find("img", first=True)]
+        images = [r.html.find(".buzzard__image", first=True).find(
+            "img", first=True)]
         # Header image
         titles = r.html.find(".title-link__title-text")
         links = r.html.find(".title-link")
@@ -80,9 +81,12 @@ class BBCChinese(BaseFeed):
 
 
 async def main():
-    bbc = BBCChinese()
-    await bbc.fetch_feed()
-    await bbc.upload()
+    try:
+        bbc = BBCChinese()
+        await bbc.fetch_feed()
+        await bbc.upload()
+    except Exception as e:
+        print(e)
 
 
 if __name__ == '__main__':

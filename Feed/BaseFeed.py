@@ -83,7 +83,7 @@ class BaseFeed:
 
     async def upload_keyword(self, pure_text: str, obj_id: int):
         """
-        Upload keyword
+        Upload keyword to the server
         :param pure_text: Text
         :param obj_id: News's id
         :return:

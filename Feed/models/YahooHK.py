@@ -52,7 +52,8 @@ class YahooHK(BaseFeed):
                 if not ad:
                     title = ele.find("h3", first=True).text
                     link = ele.find("a", first=True).absolute_links.pop()
-                    news_list.append((HanziConv.toSimplified(title), link, None))
+                    news_list.append(
+                        (HanziConv.toSimplified(title), link, None))
 
             return news_list
         except Exception as e:
@@ -61,9 +62,12 @@ class YahooHK(BaseFeed):
 
 
 async def main():
-    bbc = YahooHK()
-    await bbc.fetch_feed()
-    await bbc.upload()
+    try:
+        bbc = YahooHK()
+        await bbc.fetch_feed()
+        await bbc.upload()
+    except Exception as e:
+        print(e)
 
 
 if __name__ == '__main__':

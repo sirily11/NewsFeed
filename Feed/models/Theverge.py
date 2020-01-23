@@ -23,7 +23,8 @@ class TheVerge(BaseFeed):
         try:
             session = AsyncHTMLSession()
             r = await session.get(link)
-            cover = r.html.find(".e-image__image", first=True)  # maybe optional
+            cover = r.html.find(".e-image__image",
+                                first=True)  # maybe optional
             if cover:
                 cover = cover.attrs['data-original']
             container = r.html.find(".c-entry-content", first=True)
@@ -73,9 +74,12 @@ class TheVerge(BaseFeed):
 
 
 async def main():
-    theverge = TheVerge()
-    await theverge.fetch_feed()
-    await theverge.upload()
+    try:
+        theverge = TheVerge()
+        await theverge.fetch_feed()
+        await theverge.upload()
+    except Exception as e:
+        print(e)
 
 
 if __name__ == '__main__':
