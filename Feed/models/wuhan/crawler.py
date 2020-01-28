@@ -178,10 +178,10 @@ class Crawler:
         """
         To markdown table
         """
-        markdown = f'| {title}      |suspected       |confirmed       |cured       |dead       |\n'
-        markdown += f'| --- | --- | --- | --- | --- |\n'
+        markdown = f'| {title}      |confirmed       |cured       |dead       |\n'
+        markdown += f'| --- | --- | --- | --- |\n'
         for d in data:
-            markdown += f"| {d['provinceName']} | {d['suspectedCount']} | {d['confirmedCount']} | {d['curedCount']} | {d['deadCount']} | \n"
+            markdown += f"| {d['provinceName']} | {d['confirmedCount']} | {d['curedCount']} | {d['deadCount']} | \n"
 
         return markdown
 
