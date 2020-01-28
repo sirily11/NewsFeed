@@ -1,4 +1,4 @@
-from Feed.models.GNNNews import GNNNews
+from Feed.models import GNNNews
 import pytest
 
 

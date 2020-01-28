@@ -1,4 +1,4 @@
-from Feed.models.BBCChinese import BBCChinese
+from Feed.models import BBCChinese
 import pytest
 
 

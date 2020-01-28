@@ -1,4 +1,4 @@
-from Feed.models.GamerSky import GamerSky
+from Feed.models import GamerSky
 import pytest
 
 

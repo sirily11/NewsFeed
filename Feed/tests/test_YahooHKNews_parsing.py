@@ -1,4 +1,4 @@
-from Feed.models.YahooHK import YahooHK
+from Feed.models import YahooHK
 import pytest
 
 

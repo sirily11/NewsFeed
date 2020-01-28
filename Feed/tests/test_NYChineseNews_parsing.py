@@ -1,4 +1,4 @@
-from Feed.models.NYChinese import NYChinese
+from Feed.models import NYChinese
 import pytest
 
 

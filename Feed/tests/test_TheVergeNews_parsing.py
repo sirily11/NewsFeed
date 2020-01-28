@@ -1,4 +1,4 @@
-from Feed.models.Theverge import TheVerge
+from Feed.models import TheVerge
 import pytest
 
 
