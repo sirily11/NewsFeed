@@ -14,7 +14,6 @@ import logging
 import datetime
 import requests
 
-
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 logger = logging.getLogger(__name__)
 
@@ -28,7 +27,6 @@ class Crawler:
         self.session = requests.session()
         self.session.headers.update(headers)
         self.crawl_timestamp = int()
-
 
     def crawler(self):
         """
@@ -60,12 +58,12 @@ class Crawler:
                 continue
 
             # self.overall_parser(overall_information=overall_information)
-            p_markdown = self.province_parser(province_information=province_information)
+            p_markdown, p_data = self.province_parser(province_information=province_information)
             # self.area_parser(area_information=area_information)
-            a_markdown = self.abroad_parser(abroad_information=abroad_information)
+            a_markdown, a_data = self.abroad_parser(abroad_information=abroad_information)
             # self.news_parser(news=news)
 
-            return p_markdown, a_markdown
+            return p_markdown, p_data, a_markdown, a_data
 
         # while True:
         #     self.crawl_timestamp = int(
@@ -118,7 +116,7 @@ class Crawler:
 
             provinces_data.append(province)
         markdown = self.to_markdown_table(provinces_data, "Province")
-        return markdown
+        return markdown, provinces_data
 
     def area_parser(self, area_information):
         area_information = json.loads(area_information.group(0))
@@ -152,7 +150,7 @@ class Crawler:
 
             # self.db.insert(collection='DXYArea', data=country)
         markdown = self.to_markdown_table(country_data, 'Country')
-        return markdown
+        return markdown, country_data
 
     def news_parser(self, news):
         news = json.loads(news.group(0))
@@ -174,7 +172,7 @@ class Crawler:
 
             self.db.insert(collection='DXYRumors', data=rumor)
 
-    def to_markdown_table(self, data: List, title: str)-> str:
+    def to_markdown_table(self, data: List, title: str) -> str:
         """
         To markdown table
         """
@@ -184,8 +182,6 @@ class Crawler:
             markdown += f"| {d['provinceName']} | {d['confirmedCount']} | {d['curedCount']} | {d['deadCount']} | \n"
 
         return markdown
-
-
 
 
 if __name__ == '__main__':
