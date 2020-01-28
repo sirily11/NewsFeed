@@ -28,7 +28,8 @@ class Wuhan(BaseFeed):
         news_list = await self.fetch_list()
         for news in tqdm(news_list, desc=self.display_name):
             title, content = news
-            news_feed = BaseNews(title=title, link="https://3g.dxy.cn/newh5/view/pneumonia", cover=None, content=content, pure_text=content)
+            news_feed = BaseNews(title=title, link="https://3g.dxy.cn/newh5/view/pneumonia", cover=None,
+                                 content=content, pure_text=content)
             self.news.append(news_feed)
 
 
