@@ -123,7 +123,8 @@ class BaseFeed:
         if res.status_code != 201:
             print(res.json())
             return
-        await self.upload_keyword(obj.pure_text, res.json()['id'])
+        if obj.pure_text:
+            await self.upload_keyword(obj.pure_text, res.json()['id'])
 
     async def upload(self):
         """"
