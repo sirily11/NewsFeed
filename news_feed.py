@@ -1,5 +1,5 @@
 from Feed.models import BBCChinese, \
-    GamerSky, NYChinese, YahooHK, GNNNews, Theverge, Wuhan
+    GamerSky, NYChinese, YahooHK, GNNNews, Theverge, Wuhan, YahooTW
 import time
 import asyncio
 import datetime
@@ -15,6 +15,7 @@ async def main():
         yahooHK = YahooHK.main()
         gnn = GNNNews.main()
         theverge = Theverge.main()
+        yahooTW = YahooTW.main()
         wuhan = Wuhan.main()
 
         if time.time() - last_updated > sleep_time:
