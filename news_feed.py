@@ -20,7 +20,7 @@ async def main():
 
         if time.time() - last_updated > sleep_time:
             last_updated = time.time()
-            await asyncio.gather(nyc, bbc, gamer, yahooHK, gnn, theverge, wuhan)
+            await asyncio.gather(nyc, bbc, gamer, yahooHK, gnn, theverge, wuhan, yahooTW)
             print("Updated at", datetime.datetime.now())
             time.sleep(sleep_time)
 
