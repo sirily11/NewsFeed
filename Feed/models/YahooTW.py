@@ -26,6 +26,8 @@ class YahooTW(BaseFeed):
                 cover = cover_container.find("img", first=True)
                 if cover:
                     cover = cover.attrs['src']
+                    if "spaceball.gif" in cover:
+                        cover = None
 
             text_eles = body2.find("p")
             image_eles = body2.find("img")
