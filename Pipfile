@@ -15,6 +15,7 @@ pyquery = "*"
 hanziconv = "*"
 pytest-asyncio = "*"
 jieba = "*"
+pyppeteer = "*"
 
 [requires]
 python_version = "3.7"

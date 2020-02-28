@@ -1,0 +1,9 @@
+version: '3.0'
+
+services:
+  news_feed:
+    build: ./
+    container_name: news_feed
+    command: "python news_feed.py sync"
+    volumes:
+      - ./:/home/NewsFeed
