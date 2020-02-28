@@ -1,0 +1,3 @@
+[submodule "pyppeteer"]
+	path = pyppeteer
+	url = https://github.com/sirily11/pyppeteer.git

@@ -1,5 +1,5 @@
 from typing import List
-import pyppdf.patch_pyppeteer
+# import pyppdf.patch_pyppeteer
 
 from Feed.BaseFeed import BaseFeed
 from Feed.BaseNews import BaseNews
@@ -15,11 +15,11 @@ class CNN(BaseFeed):
         self.display_name = "CNN"
         self.__init_written_list__()
 
-    def fetch(self, link: str) -> Optional[Tuple]:
+    async def fetch(self, link: str) -> Optional[Tuple]:
         try:
-            session = HTMLSession()
-            r = session.get(link)
-            r.html.render()
+            session = AsyncHTMLSession()
+            r = await session.get(link)
+            await r.html.arender()
 
             container = r.html.find(".zn-body-text", first=True)
             contents: List[Element] = container.find()
@@ -34,23 +34,24 @@ class CNN(BaseFeed):
 
                     if "el__embedded" in element_class:
                         img = content.find('img', first=True)
-                        caption = img.attrs.get('alt')
-                        src = img.attrs.get('data-src-large')
-                        if not cover:
-                            cover = src
-                        html += f'<img src="{src}" />\n'
-                        html += f"<span>{caption}</span>\n"
+                        if img:
+                            caption = img.attrs.get('alt')
+                            src = img.attrs.get('data-src-large')
+                            if not cover:
+                                cover = src
+                            html += f'<img src="{src}" />\n'
+                            html += f"<span>{caption}</span>\n"
             self.parser.parse(html)
             return self.parser.convert(), str(self.parser), cover
         except Exception as e:
             print(e)
             return None, None, None
 
-    def fetch_list(self) -> List[Tuple[str, str, Optional[str]]]:
+    async def fetch_list(self) -> List[Tuple[str, str, Optional[str]]]:
         try:
-            session = HTMLSession()
-            r = session.get("https://www.cnn.com/")
-            r.html.render()
+            session = AsyncHTMLSession()
+            r = await session.get("https://www.cnn.com/")
+            await r.html.arender()
             news_list = []
             articles = r.html.find("article")
             for article in articles:
@@ -63,11 +64,11 @@ class CNN(BaseFeed):
             print(e)
 
 
-def main():
+async def main():
     try:
         cnn = CNN()
-        cnn.fetch_feed_sync()
-        print(cnn.news)
+        await cnn.fetch_feed()
+        # cnn.upload_sync()
         # cnn.upload()
         # cnn = CNN()
         # a, b, c = cnn.fetch(
@@ -78,6 +79,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
-
-####### find one
+    asyncio.run(main())
