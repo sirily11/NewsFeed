@@ -48,6 +48,8 @@ if __name__ == '__main__':
     if len(sys.argv) == 2:
         if sys.argv[1] == "sync":
             main_sync()
+        elif sys.argv[1] == "async":
+            asyncio.run(main())
     else:
         asyncio.run(main())
         main_sync()
