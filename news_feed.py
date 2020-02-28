@@ -12,15 +12,7 @@ async def main():
 
     while True:
         last_updated = 0
-        bbc = BBCChinese.main()
-        gamer = GamerSky.main()
-        nyc = NYChinese.main()
-        yahooHK = YahooHK.main()
-        gnn = GNNNews.main()
-        theverge = Theverge.main()
-        yahooTW = YahooTW.main()
-        wuhan = Wuhan.main()
-        cnn = Cnn.main()
+
         if time.time() - last_updated > sleep_time:
             last_updated = time.time()
             if len(sys.argv) == 2:
@@ -28,14 +20,18 @@ async def main():
                 if sys.argv[1] == "cnn":
                     await Cnn.main()
             else:
+                bbc = BBCChinese.main()
+                gamer = GamerSky.main()
+                nyc = NYChinese.main()
+                yahooHK = YahooHK.main()
+                gnn = GNNNews.main()
+                theverge = Theverge.main()
+                yahooTW = YahooTW.main()
+                wuhan = Wuhan.main()
                 await asyncio.gather(nyc, bbc, gamer, yahooHK, gnn, theverge, wuhan, yahooTW)
                 print("Updated at", datetime.datetime.now())
                 time.sleep(sleep_time)
 
 
-
-
-
 if __name__ == '__main__':
     asyncio.run(main())
-
