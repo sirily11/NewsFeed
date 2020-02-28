@@ -7,8 +7,13 @@ import json
 from Sentiment.Sentiment import Sentiment
 from Feed.stopwords import stop_words
 from tqdm import tqdm
-from Feed.key import username, password
-import jieba
+
+try:
+    from Feed.key import username, password
+    import jieba
+except Exception as e:
+    pass
+
 import collections
 
 
@@ -81,6 +86,26 @@ class BaseFeed:
                 if news_feed and news_feed.link not in self.written_list:
                     self.news.append(news_feed)
 
+    def fetch_feed_sync(self):
+        """
+        Use fetched titles, links, covers to do the
+        individual page fetching.
+        If cover is None, then using fetch to fetch cover.
+        Call this method for fetching
+        :return:
+        """
+        news_list = self.fetch_list()
+        for news in tqdm(news_list, desc=self.display_name):
+            title, link, cover = news
+            if not cover:
+                content, pure_text, cover = self.fetch(link=link)
+            else:
+                content, pure_text, _ = self.fetch(link)
+            if content:
+                news_feed = BaseNews(title=title, link=link, cover=cover, content=content, pure_text=pure_text)
+                if news_feed and news_feed.link not in self.written_list:
+                    self.news.append(news_feed)
+
     async def upload_keyword(self, pure_text: str, obj_id: int):
         """
         Upload keyword to the server
@@ -107,6 +132,31 @@ class BaseFeed:
             print(res.json())
         await asyncio.sleep(1)
 
+    def upload_keyword_sync(self, pure_text: str, obj_id: int):
+        """
+        Upload keyword to the server
+        :param pure_text: Text
+        :param obj_id: News's id
+        :return:
+        """
+        words = jieba.lcut(pure_text)
+        url = "https://qbiv28lfa0.execute-api.us-east-1.amazonaws.com/dev/news-feed/keyword/"
+        keywords = []
+        for w in words:
+            if w in stop_words:
+                continue
+            if w == "" or w == " " or w == "\n":
+                continue
+            if len(w) > 2 and w != '”':
+                keywords.append(w)
+
+        dup = [(k, count) for k, count, in collections.Counter(keywords).items() if count > 1]
+        dup.sort(key=lambda tup: tup[1], reverse=True)
+        data = [{"feed": obj_id, "keyword": k} for k, c in dup]
+        res = requests.post(url, json=data[:5])
+        if res.status_code != 201:
+            print(res.json())
+
     async def upload_item(self, obj: BaseNews, url: str, header):
         """
         Upload single Item
@@ -125,6 +175,25 @@ class BaseFeed:
             return
         if obj.pure_text:
             await self.upload_keyword(obj.pure_text, res.json()['id'])
+
+    async def upload_item_sync(self, obj: BaseNews, url: str, header):
+        """
+        Upload single Item
+        :param obj: Upload object
+        :param url: Upload URL
+        :param header: Auth Header. Use this to login the system
+        :return:
+        """
+        submit_object = obj.to_json()
+        submit_object['publisher'] = self.news_publisher
+        res = requests.post(url, json=submit_object, headers=header)
+        await asyncio.sleep(1)
+        self.written_list.append(obj.link)
+        if res.status_code != 201:
+            print(res.json())
+            return
+        if obj.pure_text:
+            self.upload_keyword_sync(obj.pure_text, res.json()['id'])
 
     async def upload(self):
         """"
@@ -149,5 +218,22 @@ class BaseFeed:
             with open(f"written-{self.news_publisher}.json", 'w') as f:
                 json.dump(self.written_list, f, ensure_ascii=False)
             return res
+        except Exception as e:
+            print(e)
+
+    def upload_sync(self):
+        """"
+        Upload Fetched data
+        """
+        try:
+            url = "https://qbiv28lfa0.execute-api.us-east-1.amazonaws.com/dev/news-feed/news/"
+            auth = requests.post("https://qbiv28lfa0.execute-api.us-east-1.amazonaws.com/dev/api/token/",
+                                 {"username": username, "password": password})
+            hed = {'Authorization': 'Bearer ' + auth.json()['access']}
+            for n in self.news:
+                self.upload_item(obj=n, url=url, header=hed)
+            with open(f"written-{self.news_publisher}.json", 'w') as f:
+                json.dump(self.written_list, f, ensure_ascii=False)
+
         except Exception as e:
             print(e)

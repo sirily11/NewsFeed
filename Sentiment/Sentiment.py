@@ -1,7 +1,11 @@
 import requests
 from typing import List, Optional
 from pprint import pprint
-from Sentiment.key import key, endpoint
+
+try:
+    from Sentiment.key import key, endpoint
+except:
+    pass
 
 
 class Sentiment:
