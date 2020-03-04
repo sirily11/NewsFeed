@@ -23,8 +23,9 @@ async def main():
             gnn = GNNNews.main()
             theverge = Theverge.main()
             yahooTW = YahooTW.main()
-            wuhan = Wuhan.main()
-            await asyncio.gather(nyc, bbc, gamer, yahooHK, gnn, theverge, wuhan, yahooTW)
+            # wuhan = Wuhan.main()
+            await asyncio.gather(nyc, bbc, gamer, yahooHK)
+            await asyncio.gather(gnn, theverge, yahooTW)
             print("Updated at", datetime.datetime.now())
             time.sleep(sleep_time)
 
@@ -41,10 +42,6 @@ def main_sync():
 
 
 if __name__ == '__main__':
-    try:
-        Display(visible=0, size=(1280, 720)).start()
-    except Exception as e:
-        print(e)
     if len(sys.argv) == 2:
         if sys.argv[1] == "sync":
             main_sync()

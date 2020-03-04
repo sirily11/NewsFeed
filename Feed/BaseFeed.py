@@ -4,6 +4,7 @@ from typing import List, Optional, Tuple
 import requests
 import asyncio
 import json
+from Database.database import DatabaseProvider
 from Sentiment.Sentiment import Sentiment
 from Feed.stopwords import stop_words
 from tqdm import tqdm
@@ -42,6 +43,7 @@ class BaseFeed:
         :return:
         """
         try:
+            self.database_provider = DatabaseProvider(self.news_publisher)
             with open(f"written-{self.news_publisher}.json", "r") as f:
                 data = f.read()
                 if data != '':
@@ -76,16 +78,23 @@ class BaseFeed:
         :return:
         """
         news_list = await self.fetch_list()
+        total_length = len(news_list)
+        current_index = 0
         for news in tqdm(news_list, desc=self.display_name):
             title, link, cover = news
             if not cover:
                 content, pure_text, cover = await self.fetch(link=link)
             else:
                 content, pure_text, _ = await self.fetch(link)
+
+            self.database_provider.update_progress(progress=(current_index / total_length) * 100, is_finished=False)
             if content:
                 news_feed = BaseNews(title=title, link=link, cover=cover, content=content, pure_text=pure_text)
                 if news_feed and news_feed.link not in self.written_list:
                     self.news.append(news_feed)
+            current_index += 1
+        self.database_provider.update_progress(progress=100, is_finished=True)
+        self.database_provider.add_log("Success fetch the feed")
 
     async def upload_keyword(self, pure_text: str, obj_id: int):
         """
@@ -151,9 +160,12 @@ class BaseFeed:
                                  {"username": username, "password": password})
             await asyncio.sleep(2)
             hed = {'Authorization': 'Bearer ' + auth.json()['access']}
+            self.database_provider.update_upload_progress(progress=0, is_finished=False)
             res = await asyncio.gather(*(self.upload_item(obj=n, url=url, header=hed) for n in self.news))
+            self.database_provider.update_upload_progress(progress=100, is_finished=True)
             with open(f"written-{self.news_publisher}.json", 'w') as f:
                 json.dump(self.written_list, f, ensure_ascii=False)
+            self.database_provider.add_log("Successful upload the feed")
             return res
         except Exception as e:
             print(e)
