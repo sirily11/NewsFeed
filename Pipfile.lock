@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c815c09368196539230e5b5011cb4c37d6952a066590ee7469ad72076d822bd3"
+            "sha256": "17b677901afbee3523e17747b16e9880af49d84863cf09ed4875e51e569553de"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -185,9 +185,9 @@
         },
         "parse": {
             "hashes": [
-                "sha256:95a4f4469e37c57b5e924629ac99926f28bee7da59515dc5b8078c4c3e779249"
+                "sha256:a6d4e2c2f1fbde6717d28084a191a052950f758c0cbd83805357e6575c2b95c0"
             ],
-            "version": "==1.14.0"
+            "version": "==1.15.0"
         },
         "pluggy": {
             "hashes": [
@@ -221,7 +221,6 @@
             "hashes": [
                 "sha256:51fe769b722a1718043b74d12c20420f29e0dd9eeea2b66652b7f93a9ad465dd"
             ],
-            "index": "pypi",
             "version": "==0.0.25"
         },
         "pyquery": {
@@ -277,6 +276,14 @@
                 "sha256:fcd71e08c0aee99aca1b73f45478549ee7e7fc006d51b37bec9e9def7dc22b69"
             ],
             "version": "==2.0"
+        },
+        "tinydb": {
+            "hashes": [
+                "sha256:1087ade5300c47dbf9539d9f6dafd53115bd5e85a67d480d8188bdbfa2d9eaf4",
+                "sha256:f273d9b6d8b1b5e1d094a6eb8b72851b39b81099293344132c73332b60e3b893"
+            ],
+            "index": "pypi",
+            "version": "==3.15.2"
         },
         "tqdm": {
             "hashes": [
@@ -335,10 +342,10 @@
         },
         "zipp": {
             "hashes": [
-                "sha256:12248a63bbdf7548f89cb4c7cda4681e537031eda29c02ea29674bc6854460c2",
-                "sha256:7c0f8e91abc0dc07a5068f315c52cb30c66bfbc581e5b50704c8a2f6ebae794a"
+                "sha256:aa36550ff0c0b7ef7fa639055d797116ee891440eac1a56f378e2d3179e0320b",
+                "sha256:c599e4d75c98f6798c509911d08a22e6c021d074469042177c8c86fb92eefd96"
             ],
-            "version": "==3.0.0"
+            "version": "==3.1.0"
         }
     },
     "develop": {

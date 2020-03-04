@@ -16,6 +16,7 @@ hanziconv = "*"
 pytest-asyncio = "*"
 jieba = "*"
 pyppeteer = "*"
+tinydb = "*"
 
 [requires]
 python_version = "3.7"
