@@ -1,3 +1,4 @@
+from Feed.BaseFeed import BaseFeed
 from Feed.BaseNews import BaseNews
 from Parser.BaseParser import BaseParser
 from typing import List, Optional, Tuple
@@ -17,7 +18,7 @@ except Exception as e:
 import collections
 
 
-class BaseFeedSync:
+class BaseFeedSync(BaseFeed):
     parser: BaseParser
     """
     List of news
@@ -29,42 +30,7 @@ class BaseFeedSync:
         News feed object. Fetch news from internet and then post the data to database
         :param parser: HTML Parser. Default is base parser.
         """
-        self.parser = parser
-        self.news: list[BaseNews] = []
-        self.news_publisher: int = None
-        self.written_list: List = []
-        self.display_name = ""
-
-    def __init_written_list__(self):
-        """
-        Init the written list
-        :return:
-        """
-        try:
-            with open(f"written-{self.news_publisher}.json", "r") as f:
-                data = f.read()
-                if data != '':
-                    self.written_list = json.loads(data)
-        except FileNotFoundError as e:
-            print(e)
-
-    def fetch(self, link: str) -> Optional[Tuple]:
-        """
-        Fetch individual page's content.
-        Override this to fetch the content of the news feed
-        :return: News content (parsed), pure text version's content, cover
-        """
-        raise NotImplementedError
-
-    def fetch_list(self) -> List[Tuple[str, str, Optional[str]]]:
-        """
-        Fetch list of news.
-        This will let the software to fetch list of news,
-        and then this will call fetch function to fetch
-        individual content
-        :return: List( title, link, cover)
-        """
-        raise NotImplementedError
+        super().__init__(parser)
 
     def fetch_feed(self):
         """

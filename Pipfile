@@ -17,6 +17,9 @@ pytest-asyncio = "*"
 jieba = "*"
 pyppeteer = "*"
 tinydb = "*"
+quart = "*"
+pyvirtualdisplay = "*"
+flask-paginate = "*"
 
 [requires]
 python_version = "3.7"

@@ -1,49 +1,48 @@
+from _asyncio import Task
 from datetime import datetime
-
-from quart import Quart, render_template, jsonify, g, redirect
+from quart import Quart, render_template, jsonify, g, redirect, request
 import time
 import asyncio
 from Database.database import DatabaseProvider
 from Feed.models import BBCChinese, \
     GamerSky, NYChinese, YahooHK, GNNNews, Theverge, Wuhan, YahooTW, Cnn
+from flask_paginate import Pagination, get_page_parameter
 
 app = Quart(__name__)
 
 global is_start
 global task
 
-list_feed = [
+list_feed_info = [
     BBCChinese.BBCChinese().get_info(),
     GamerSky.GamerSky().get_info(),
     GNNNews.GNNNews().get_info(),
     YahooHK.YahooHK().get_info(),
     YahooTW.YahooTW().get_info(),
     NYChinese.NYChinese().get_info(),
-    Theverge.TheVerge().get_info()
+    Theverge.TheVerge().get_info(),
+    Cnn.CNN().get_info()
 ]
 
 
 async def run():
     last_updated = 0
     sleep_time = 1800
-    task1 = None
-    task2 = None
 
     global is_start
     while is_start:
         if time.time() - last_updated > sleep_time and is_start:
             print("Start fetching")
             last_updated = time.time()
-            bbc = BBCChinese.main()
-            gamer = GamerSky.main()
-            nyc = NYChinese.main()
-            yahooHK = YahooHK.main()
-            gnn = GNNNews.main()
-            theverge = Theverge.main()
-            yahooTW = YahooTW.main()
+            await BBCChinese.main()
+            await GamerSky.main()
+            await NYChinese.main()
+            await YahooHK.main()
+            await GNNNews.main()
+            await Theverge.main()
+            await YahooTW.main()
             # wuhan = Wuhan.main()
-            await asyncio.gather(nyc, bbc, gamer, yahooHK)
-            await asyncio.gather(gnn, theverge, yahooTW)
+
             print("Updated at", datetime.now())
             await asyncio.sleep(sleep_time)
 
@@ -57,18 +56,20 @@ async def root_home():
     return await render_template('root_home.html')
 
 
-@app.route("/start", methods=['POST'])
+@app.route("/start/", methods=['POST'])
 async def start():
-    global is_start
+    global is_start, task
     is_start = True
-    # asyncio.create_task(run())
+    # task = asyncio.create_task(run())
     return redirect("/home")
 
 
 @app.route("/stop", methods=['GET', 'POST'])
 async def stop():
-    global is_start
+    global is_start, task
     is_start = False
+    if task:
+        task.cancel()
     return redirect('/')
 
 
@@ -78,7 +79,7 @@ async def home():
     if not is_start:
         return redirect("/")
 
-    return await render_template('home.html', feeds=list_feed)
+    return await render_template('home.html', feeds=list_feed_info)
 
 
 @app.route('/detail/<news_id>')
@@ -98,7 +99,7 @@ async def logs():
     logs = DatabaseProvider.get_all_logs()
     for log in logs:
         news_id = log['news_id']
-        for l in list_feed:
+        for l in list_feed_info:
             if l['news_id'] == news_id:
                 log['name'] = l['name']
     return await render_template('logs.html', logs=logs)
@@ -116,6 +117,7 @@ async def update_upload_progress():
     database_provider = DatabaseProvider()
 
     return jsonify(database_provider.get_all_upload_progress())
+
 
 if __name__ == '__main__':
     global is_start

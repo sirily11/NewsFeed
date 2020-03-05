@@ -165,9 +165,12 @@ class BaseFeed:
             auth = requests.post("https://qbiv28lfa0.execute-api.us-east-1.amazonaws.com/dev/api/token/",
                                  {"username": username, "password": password})
             await asyncio.sleep(2)
+            res = None
             hed = {'Authorization': 'Bearer ' + auth.json()['access']}
             self.database_provider.update_upload_progress(progress=0, is_finished=False)
-            res = await asyncio.gather(*(self.upload_item(obj=n, url=url, header=hed) for n in self.news))
+            for i, n in enumerate(self.news):
+                res = await self.upload_item(obj=n, url=url, header=hed)
+                self.database_provider.update_upload_progress(progress=(i / len(self.news)) * 100, is_finished=False)
             self.database_provider.update_upload_progress(progress=100, is_finished=True)
             with open(f"written-{self.news_publisher}.json", 'w') as f:
                 json.dump(self.written_list, f, ensure_ascii=False)

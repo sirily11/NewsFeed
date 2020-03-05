@@ -56,13 +56,13 @@ class DatabaseProvider:
         return [d for d in data]
 
     def get_logs(self) -> [Logs]:
-        data: List = self.logs_db.search(where('news_id') == int(self.feed_id))
+        data: List = self.logs_db.search(where('news_id') == int(self.feed_id))[:20]
         data.reverse()
         return [Logs.from_json(msg=d) for d in data]
 
     @staticmethod
     def get_all_logs():
-        data = TinyDB('./log_db.json').all()
+        data = TinyDB('./log_db.json').all()[:30]
         data.reverse()
         return data
 
