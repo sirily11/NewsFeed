@@ -10,7 +10,7 @@ class Logs(Encodeable):
                     time=msg['time'])
 
     def to_json(self) -> dict:
-        return {"news_id": self.news_id, "message": self.msg, 'time': str(self.time)}
+        return {"news_id": self.news_id, "message": self.msg, 'time': str(datetime.datetime.now())}
 
     def __init__(self, news_id, msg: str, time=datetime.datetime.now()):
         self.news_id = news_id
