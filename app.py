@@ -6,7 +6,6 @@ import asyncio
 from Database.database import DatabaseProvider
 from Feed.models import BBCChinese, \
     GamerSky, NYChinese, YahooHK, GNNNews, Theverge, Wuhan, YahooTW, Cnn
-from flask_paginate import Pagination, get_page_parameter
 
 app = Quart(__name__)
 
@@ -60,7 +59,7 @@ async def root_home():
 async def start():
     global is_start, task
     is_start = True
-    # task = asyncio.create_task(run())
+    task = asyncio.create_task(run())
     return redirect("/home")
 
 
