@@ -51,6 +51,12 @@ class BaseFeed:
         except FileNotFoundError as e:
             print(e)
 
+    def get_info(self) -> dict:
+        """
+        Get info for current feed
+        """
+        return {"news_id": self.news_publisher, "name": self.display_name}
+
     async def fetch(self, link: str) -> Optional[Tuple]:
         """
         Fetch individual page's content.
@@ -169,3 +175,4 @@ class BaseFeed:
             return res
         except Exception as e:
             print(e)
+            self.database_provider.add_log(f"error: {e}")

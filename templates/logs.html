@@ -1,0 +1,23 @@
+{% extends 'header.html' %}
+{% block content %}
+    {% include 'navbar.html' %}
+    <div class="card w-100">
+        <div class="card-body">
+            <div class="list-group">
+                {% for log in logs %}
+                    <a href="" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ log['name'] }}</h5>
+                            <small>Time: {{ log['time'] }}</small>
+                        </div>
+                        <p class="mb-1">{{ log['message'] }}</p>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <form action="/stop" method="POST">
+        <button type="submit" class="btn btn-danger mt-3">Stop</button>
+    </form>
+
+{% endblock %}
