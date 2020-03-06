@@ -1,4 +1,4 @@
-from Feed.models import NYChinese
+from Feed.models.NYChinese import NYChinese
 import pytest
 
 
@@ -10,7 +10,7 @@ async def test_parse_list():
 
 
 @pytest.mark.asyncio
-async def test_parse_list():
+async def test_parse_list2():
     ny_chinese = NYChinese()
     news_list = await ny_chinese.fetch_list()
     success = False

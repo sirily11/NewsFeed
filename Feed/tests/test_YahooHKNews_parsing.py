@@ -1,4 +1,4 @@
-from Feed.models import YahooHK
+from Feed.models.YahooHK import YahooHK
 import pytest
 
 
@@ -10,7 +10,7 @@ async def test_parse_list():
 
 
 @pytest.mark.asyncio
-async def test_parse_list():
+async def test_parse_list2():
     yahoo_hk = YahooHK()
     news_list = await yahoo_hk.fetch_list()
     success = False

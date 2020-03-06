@@ -1,4 +1,4 @@
-from Feed.models import TheVerge
+from Feed.models.Theverge import TheVerge
 import pytest
 
 
@@ -10,7 +10,7 @@ async def test_parse_list():
 
 
 @pytest.mark.asyncio
-async def test_parse_list():
+async def test_parse_list2():
     the_verge = TheVerge()
     news_list = await the_verge.fetch_list()
     success = False

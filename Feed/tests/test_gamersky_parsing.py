@@ -1,4 +1,4 @@
-from Feed.models import GamerSky
+from Feed.models.GamerSky import GamerSky
 import pytest
 
 
@@ -10,7 +10,7 @@ async def test_parse_list():
 
 
 @pytest.mark.asyncio
-async def test_parse_list():
+async def test_parse_list2():
     gamer = GamerSky()
     news_list = await gamer.fetch_list()
     success = False

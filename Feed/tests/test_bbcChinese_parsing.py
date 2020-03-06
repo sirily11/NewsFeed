@@ -1,4 +1,4 @@
-from Feed.models import BBCChinese
+from Feed.models.BBCChinese import BBCChinese
 import pytest
 
 
@@ -10,7 +10,7 @@ async def test_parse_list():
 
 
 @pytest.mark.asyncio
-async def test_parse_list():
+async def test_parse_list2():
     bbc = BBCChinese()
     news_list = await bbc.fetch_list()
     success = False

@@ -10,7 +10,7 @@ class BaseConvertTest(TestCase):
     def test_convert_content(self):
         objects = [ParsedObject(tag="content", content="Hello")]
         ret = self.converter.convert(objects)
-        self.assertEqual(ret, "Hello\n")
+        self.assertEqual(ret, "Hello\n\n")
 
     def test_convert_header(self):
         objects = [HeaderObject(content="Header2", level=2)]
@@ -48,12 +48,11 @@ class MultiConvertTest(TestCase):
             ParsedObject(tag="content", content="Hello world",
                          children=[LinkObject(content="world", link="google.com")])]
         ret = self.converter.convert(objects)
-        self.assertEqual(ret, "Hello [world](google.com) \n")
+        self.assertEqual(ret, "Hello [world](google.com) \n\n")
 
     def test_convert_content2(self):
         objects = [
             ParsedObject(tag="content", content="Hello world",
                          children=[ParsedObject(content="world", tag="image")])]
         ret = self.converter.convert(objects)
-        self.assertEqual(ret, "Hello \n![](world)\n\n\n")
-
+        self.assertEqual(ret, "Hello \n![](world)\n\n\n\n")

@@ -1,4 +1,4 @@
-from Feed.models import GNNNews
+from Feed.models.GNNNews import GNNNews
 import pytest
 
 
@@ -10,7 +10,7 @@ async def test_parse_list():
 
 
 @pytest.mark.asyncio
-async def test_parse_list():
+async def test_parse_list2():
     gamer = GNNNews()
     news_list = await gamer.fetch_list()
     success = False
