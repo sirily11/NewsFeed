@@ -17,6 +17,14 @@ class DatabaseProvider:
         self.logs_db = self.db.table('logs')
         self.upload_progress_db = self.db.table('upload_progress')
 
+    def remove_progress(self):
+        """
+        Delete upload progress and fetching progress
+        :return:
+        """
+        self.db.purge_table('progress')
+        self.db.purge_table('upload_progress')
+
     def update_progress(self, progress: float, is_finished: bool):
         """
         Update current news progress according to the feed_id

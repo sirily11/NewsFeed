@@ -60,6 +60,8 @@ async def start():
     global is_start, task
     is_start = True
     task = asyncio.create_task(run())
+    database = DatabaseProvider()
+    database.remove_progress()
     return redirect("/home")
 
 
@@ -95,13 +97,13 @@ async def detail(news_id: int):
 async def logs():
     if not is_start:
         return redirect("/")
-    logs = DatabaseProvider.get_all_logs()
-    for log in logs:
+    database_logs = DatabaseProvider().get_all_logs()
+    for log in database_logs:
         news_id = log['news_id']
         for l in list_feed_info:
             if l['news_id'] == news_id:
                 log['name'] = l['name']
-    return await render_template('logs.html', logs=logs)
+    return await render_template('logs.html', logs=database_logs)
 
 
 @app.route("/update_progress", methods=["GET"])

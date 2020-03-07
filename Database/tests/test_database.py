@@ -24,3 +24,15 @@ class DatabaseTest(TestCase):
         # Two logs should not with same time
         self.assertNotEqual(logs[0].time, logs[1].time)
 
+    def test_remove(self):
+        self.database.add_log(msg="New log1")
+        self.database.update_progress(40, False)
+        self.database.update_upload_progress(30, False)
+        p = self.database.get_progress()
+        up = self.database.get_upload_progress()
+        self.assertEqual(40, p.progress)
+        self.assertEqual(30, up.progress)
+        self.database.remove_progress()
+        self.assertEqual(0, len(self.database.progress_db))
+        self.assertEqual(0, len(self.database.upload_progress_db))
+
