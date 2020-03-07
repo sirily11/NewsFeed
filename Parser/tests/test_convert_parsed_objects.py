@@ -1,6 +1,6 @@
 from unittest import TestCase
-from Parser.BaseConverter import BaseConverter
-from Parser.ParsedObject import ParsedObject, ListElementObject, LinkObject, HeaderObject
+from ..BaseConverter import BaseConverter
+from ..ParsedObject import ParsedObject, ListElementObject, LinkObject, HeaderObject
 
 
 class BaseConvertTest(TestCase):

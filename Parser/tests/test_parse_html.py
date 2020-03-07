@@ -1,5 +1,5 @@
 from unittest import TestCase
-from Parser.BaseParser import BaseParser
+from ..BaseParser import BaseParser
 from Parser.BaseConverter import BaseConverter
 
 
@@ -26,7 +26,7 @@ class BaseParseTest(TestCase):
         self.parser.parse(html)
         self.assertEqual(len(self.parser.parsed_objects), 1)
         self.assertEqual(self.parser.parsed_objects[0].tag, "content")
-        self.assertEqual(self.parser.parsed_objects[0].content, None)
+        self.assertEqual(self.parser.parsed_objects[0].content, "")
 
     def test_parse_header(self):
         html = "<h2>Hello</h2>"
@@ -53,7 +53,7 @@ class BaseParseTest(TestCase):
         html = "<a href='google.com'>Link</a>"
         self.parser.parse(html)
         self.assertEqual(len(self.parser.parsed_objects), 1)
-        self.assertEqual(self.parser.parsed_objects[0].tag, "link")
+        self.assertEqual("link", self.parser.parsed_objects[0].tag)
         self.assertEqual(self.parser.parsed_objects[0].link, "google.com")
         self.assertEqual(self.parser.parsed_objects[0].content, "Link")
 
@@ -91,18 +91,29 @@ class MultilevelParserTest(TestCase):
         self.assertEqual(self.parser.parsed_objects[1].content, "Hello world")
 
     def test_inline_link(self):
-        html = "<div><p>Hello <a>link</a></p></div>"
+        html = "<div><p>Hello<a>link</a></p></div>"
         self.parser.parse(html)
         self.assertEqual(len(self.parser.parsed_objects), 1)
         self.assertEqual(len(self.parser.parsed_objects[0].children), 1)
         self.assertEqual(self.parser.parsed_objects[0].children[0].tag, "link")
 
     def test_inline_link2(self):
+        html = '''<span>国集团领导人周二临时磋商结束时只是发表<a href="https://www.nytimes.com/2020/03/03/business/central-banks-coronavirus-g7.html" title="Link: https://www.nytimes.com/2020/03/03/business/central-banks-coronavirus-g7.html">泛泛的团结声明</a>，没有具体行动——没有承诺削减利率，没有承诺政府协调支出——他们</span>'''
+        self.parser.parse(html)
+        self.assertEqual(len(self.parser.parsed_objects), 3)
+        self.assertEqual('国集团领导人周二临时磋商结束时只是发表', self.parser.parsed_objects[0].content)
+
+    def test_inline_link3(self):
         html = "<h2><p>Hello <a>link</a></p></h2>"
         self.parser.parse(html)
         self.assertEqual(len(self.parser.parsed_objects), 1)
         self.assertEqual(len(self.parser.parsed_objects[0].children), 1)
         self.assertEqual(self.parser.parsed_objects[0].children[0].tag, "link")
+
+    def test_inline_link4(self):
+        html = '''<span>国集团领导人周二临时磋商结束时只是发表<a href="https://abc.com">泛泛的团结声明</a>，没有具体行动——没有承诺削减利率，<a href="https://abc.com">没有</a> 承诺政府协调支出——他们</span>'''
+        self.parser.parse(html)
+        self.assertEqual(len(self.parser.parsed_objects), 5)
 
     def test_parse_complex_html(self):
         html = """
@@ -144,5 +155,5 @@ class MultilevelParserTest(TestCase):
         self.assertEqual(len(self.parser.parsed_objects), 1)
         self.assertEqual(self.parser.parsed_objects[0].tag, "content")
         self.assertEqual(len(self.parser.parsed_objects[0].children), 2)
-        self.assertEqual(self.parser.parsed_objects[0].children[0].tag, "image")
-
+        self.assertEqual(
+            self.parser.parsed_objects[0].children[0].tag, "image")
