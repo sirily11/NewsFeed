@@ -76,10 +76,10 @@ class TheVerge(BaseFeed):
 async def main():
     try:
         theverge = TheVerge()
-        await theverge.fetch(link="https://www.theverge.com/2020/3/6/21168211/ebay-coronavirus-sales-ban-face-masks-hand-sanitizer-price-gouging")
-
-        # await theverge.fetch_feed()
-        # await theverge.upload()
+        # result , t, a = await theverge.fetch(link="https://www.theverge.com/2020/3/6/21168211/ebay-coronavirus-sales-ban-face-masks-hand-sanitizer-price-gouging")
+        # print(result)
+        await theverge.fetch_feed()
+        await theverge.upload()
     except Exception as e:
         print(e)
 
