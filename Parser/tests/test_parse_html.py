@@ -94,8 +94,8 @@ class MultilevelParserTest(TestCase):
         html = "<div><p>Hello<a>link</a></p></div>"
         self.parser.parse(html)
         self.assertEqual(len(self.parser.parsed_objects), 1)
-        self.assertEqual(len(self.parser.parsed_objects[0].children), 1)
-        self.assertEqual(self.parser.parsed_objects[0].children[0].tag, "link")
+        self.assertEqual(len(self.parser.parsed_objects[0].children), 2)
+        self.assertEqual(self.parser.parsed_objects[0].children[0].tag, "content")
 
     def test_inline_link2(self):
         html = '''<span>国集团领导人周二临时磋商结束时只是发表<a href="https://www.nytimes.com/2020/03/03/business/central-banks-coronavirus-g7.html" title="Link: https://www.nytimes.com/2020/03/03/business/central-banks-coronavirus-g7.html">泛泛的团结声明</a>，没有具体行动——没有承诺削减利率，没有承诺政府协调支出——他们</span>'''
@@ -107,13 +107,20 @@ class MultilevelParserTest(TestCase):
         html = "<h2><p>Hello <a>link</a></p></h2>"
         self.parser.parse(html)
         self.assertEqual(len(self.parser.parsed_objects), 1)
-        self.assertEqual(len(self.parser.parsed_objects[0].children), 1)
-        self.assertEqual(self.parser.parsed_objects[0].children[0].tag, "link")
+        self.assertEqual(len(self.parser.parsed_objects[0].children), 2)
+        self.assertEqual(self.parser.parsed_objects[0].children[0].tag, "content")
+        self.assertEqual(self.parser.parsed_objects[0].children[1].tag, "link")
 
     def test_inline_link4(self):
         html = '''<span>国集团领导人周二临时磋商结束时只是发表<a href="https://abc.com">泛泛的团结声明</a>，没有具体行动——没有承诺削减利率，<a href="https://abc.com">没有</a> 承诺政府协调支出——他们</span>'''
         self.parser.parse(html)
         self.assertEqual(len(self.parser.parsed_objects), 5)
+
+    def test_inline_link5(self):
+        html = '''<div><p id="9lzZkX">eBay is escalating its fight against online price gouging during the coronavirus outbreak with a new outright ban on all sales of face masks, hand sanitizer, and disinfectant wipes. The new policy, <a href="https://community.ebay.com/t5/Announcements/UPDATE-Important-information-about-listings-associated-with/ba-p/30734312">outlined in a notice to sellers posted Friday</a>, applies both to new listings and existing ones. eBay says it is in the process of removing current listings for these items as well as listings that mention the coronavirus, COVID-19 (the illness it causes), and other popular variations of the phrases like 2019nCoV. </p></div>'''
+        self.parser.parse(html)
+        self.assertEqual(len(self.parser.parsed_objects), 1)
+        self.assertEqual(len(self.parser.parsed_objects[0].children), 3)
 
     def test_parse_complex_html(self):
         html = """

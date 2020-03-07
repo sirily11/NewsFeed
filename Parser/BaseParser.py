@@ -55,12 +55,17 @@ class BaseParser:
         :param child: PyQuery object
         :return: ParsedObject
         """
-        children = PyQuery(child).children()
+        has_child = len(PyQuery(child).children()) > 0
+        children = list(PyQuery(child).contents())
         children_list = []
-        for c in children:
-            parsed = self.__parse__(c)
-            if parsed:
-                children_list.append(parsed)
+        if has_child:
+            for c in children:
+                try:
+                    parsed = self.__parse__(c)
+                    if parsed:
+                        children_list.append(parsed)
+                except Exception as e:
+                    pass
         if child is not PyQuery:
             child = PyQuery(child)
 
