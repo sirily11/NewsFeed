@@ -1,3 +1,4 @@
+import datetime
 from typing import List
 
 from Database.logs import Logs
@@ -11,9 +12,10 @@ class DatabaseProvider:
 
     def __init__(self, feed_id: int = None):
         self.feed_id = feed_id
-        self.progress_db = TinyDB('./news_db_progress.json')
-        self.logs_db = TinyDB('./log_db.json')
-        self.upload_progress_db = TinyDB('./upload_progress.json')
+        self.db = TinyDB('./news_feed.json')
+        self.progress_db = self.db.table('progress')
+        self.logs_db = self.db.table('logs')
+        self.upload_progress_db = self.db.table('upload_progress')
 
     def update_progress(self, progress: float, is_finished: bool):
         """
@@ -36,7 +38,8 @@ class DatabaseProvider:
         self.upload_progress_db.upsert(pro.to_json(), where('news_id') == self.feed_id)
 
     def add_log(self, msg):
-        log = Logs(news_id=self.feed_id, msg=msg)
+        now = datetime.datetime.now()
+        log = Logs(news_id=self.feed_id, msg=msg, time=now)
         self.logs_db.insert(log.to_json())
 
     def get_progress(self) -> Progress:
@@ -56,15 +59,24 @@ class DatabaseProvider:
         return [d for d in data]
 
     def get_logs(self) -> [Logs]:
-        data: List = self.logs_db.search(where('news_id') == int(self.feed_id))[:20]
+        """
+        Get all logs according to the feed id
+        :return:
+        """
+        if not self.feed_id:
+            raise Exception("You need to define the feed id in order to retrieve this")
+        data: List = self.logs_db.search(where('news_id') == int(self.feed_id))
         data.reverse()
-        return [Logs.from_json(msg=d) for d in data]
+        return [Logs.from_json(msg=d) for d in data[:20]]
 
-    @staticmethod
-    def get_all_logs():
-        data = TinyDB('./log_db.json').all()[:30]
+    def get_all_logs(self):
+        """
+        Get all logs without using feed id
+        :return:
+        """
+        data = self.logs_db.all()
         data.reverse()
-        return data
+        return data[:30]
 
 
 if __name__ == '__main__':
