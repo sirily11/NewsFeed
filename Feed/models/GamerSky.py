@@ -25,6 +25,7 @@ class GamerSky(BaseFeed):
             texts = []
             images = []
             content = ""
+            cover = None
 
             for c in content_list:
                 image = c.find("img", first=True)
@@ -32,12 +33,14 @@ class GamerSky(BaseFeed):
                     if image.attrs['src'] not in images:
                         content += image.html
                         images.append(image.attrs['src'])
+                        if not cover:
+                            cover = image.attrs['src']
                 else:
                     if c.text not in texts:
                         content += c.html
                         texts.append(c.text)
             self.parser.parse(content)
-            return self.parser.convert(), str(self.parser), None
+            return self.parser.convert(), str(self.parser), cover
         except Exception as e:
             return None, None, None
 
