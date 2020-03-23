@@ -113,7 +113,7 @@ class BaseFeed:
         url = "https://qbiv28lfa0.execute-api.us-east-1.amazonaws.com/dev/news-feed/keyword/"
         keywords = []
         for w in words:
-            if w in stop_words:
+            if w.lower() in stop_words:
                 continue
             if w == "" or w == " " or w == "\n":
                 continue
