@@ -111,6 +111,24 @@ class BaseFeed:
         """
         words = jieba.lcut(pure_text)
         url = "https://qbiv28lfa0.execute-api.us-east-1.amazonaws.com/dev/news-feed/keyword/"
+
+        new_keywords = self.filter_keywords(words)
+
+        dup = [(k, count) for k, count, in collections.Counter(new_keywords).items() if count > 1]
+        dup.sort(key=lambda tup: tup[1], reverse=True)
+        data = [{"feed": obj_id, "keyword": k} for k, c in dup]
+        res = requests.post(url, json=data[:5])
+        if res.status_code != 201:
+            print(res.json())
+        await asyncio.sleep(1)
+
+    @staticmethod
+    def filter_keywords(words):
+        """
+        Generate keyword without stop words
+        :param words:
+        :return:
+        """
         keywords = []
         for w in words:
             if w.lower() in stop_words:
@@ -119,14 +137,7 @@ class BaseFeed:
                 continue
             if len(w) > 2 and w != '”':
                 keywords.append(w)
-
-        dup = [(k, count) for k, count, in collections.Counter(keywords).items() if count > 1]
-        dup.sort(key=lambda tup: tup[1], reverse=True)
-        data = [{"feed": obj_id, "keyword": k} for k, c in dup]
-        res = requests.post(url, json=data[:5])
-        if res.status_code != 201:
-            print(res.json())
-        await asyncio.sleep(1)
+        return keywords
 
     async def upload_item(self, obj: BaseNews, url: str, header):
         """
