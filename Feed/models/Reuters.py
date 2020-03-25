@@ -32,7 +32,8 @@ class Reuters(BaseFeed):
                     if image_src:
                         image_src = image_src[2:]
                         image_src = image_src.replace("&w=20", "")
-                        html += f'<img src=https://{image_src} />'
+                        image_src = f"https://{image_src}.jpg"
+                        html += f'<img src={image_src} />'
                         if not cover:
                             cover = image_src
                         continue

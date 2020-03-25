@@ -63,7 +63,7 @@ class BaseConverter:
         Parse content tags. <p/>, </span>, <div/>
         :return:
         """
-        return f"\n\n{parse_object.content}{self.__convert__(parse_object.children)}"
+        return f"{parse_object.content}{self.__convert__(parse_object.children)}\n\n"
 
     def __convert_list__(self, parse_object: ParsedObject):
         """
