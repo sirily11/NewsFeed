@@ -5,7 +5,7 @@ import time
 import asyncio
 from Database.database import DatabaseProvider
 from Feed.models import BBCChinese, \
-    GamerSky, NYChinese, YahooHK, GNNNews, Theverge, Wuhan, YahooTW, Cnn
+    GamerSky, NYChinese, YahooHK, GNNNews, Theverge, Wuhan, YahooTW, Cnn, Reuters
 
 app = Quart(__name__)
 
@@ -20,7 +20,8 @@ list_feed_info = [
     YahooTW.YahooTW().get_info(),
     NYChinese.NYChinese().get_info(),
     Theverge.TheVerge().get_info(),
-    Cnn.CNN().get_info()
+    Cnn.CNN().get_info(),
+    Reuters.Reuters().get_info()
 ]
 
 
@@ -40,6 +41,7 @@ async def run():
             await GNNNews.main()
             await Theverge.main()
             await YahooTW.main()
+            await Reuters.main()
             # wuhan = Wuhan.main()
 
             print("Updated at", datetime.now())

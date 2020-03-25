@@ -1,5 +1,5 @@
 from Feed.models import BBCChinese, \
-    GamerSky, NYChinese, YahooHK, GNNNews, Theverge, Wuhan, YahooTW, Cnn
+    GamerSky, NYChinese, YahooHK, GNNNews, Theverge, Wuhan, YahooTW, Cnn, Reuters
 import time
 import asyncio
 import datetime
@@ -23,9 +23,11 @@ async def main():
             gnn = GNNNews.main()
             theverge = Theverge.main()
             yahooTW = YahooTW.main()
+            reuters = Reuters.main()
             # wuhan = Wuhan.main()
             await asyncio.gather(nyc, bbc, gamer, yahooHK)
-            await asyncio.gather(gnn, theverge, yahooTW)
+            await asyncio.gather(gnn, theverge, yahooTW, reuters)
+
             print("Updated at", datetime.datetime.now())
             time.sleep(sleep_time)
 
