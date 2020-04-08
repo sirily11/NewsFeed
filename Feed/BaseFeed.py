@@ -8,15 +8,18 @@ from Database.database import DatabaseProvider
 from Sentiment.Sentiment import Sentiment
 from Feed.stopwords import stop_words
 from tqdm import tqdm
+import os
 import threading
 
 try:
-    from Feed.key import username, password
     import jieba
 except Exception as e:
     pass
 
 import collections
+
+username = os.getenv("news-feed-username")
+password = os.getenv("news-feed-password")
 
 
 class BaseFeed:
