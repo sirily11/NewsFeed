@@ -56,28 +56,16 @@ class BBCChinese(BaseFeed):
             # print(e)
             return None, None, None
 
-    async def fetch_list(self) -> List[Tuple[str, str, str]]:
+    async def fetch_list(self) -> List[Tuple[str, str, None]]:
         session = AsyncHTMLSession()
         r: HTMLResponse = await session.get("https://www.bbc.com/zhongwen/simp")
-        images = [r.html.find(".buzzard__image", first=True).find(
-            "img", first=True)]
-        # Header image
-        titles = r.html.find(".title-link__title-text")
-        links = r.html.find(".title-link")
-        images += r.html.find(".js-delayed-image-load")
-        return_list: List[Tuple[str, str, str]] = []
-
-        for i, image in enumerate(images):
-            link = links[i].absolute_links.pop()
-            title = titles[i]
-            if i == 0:
-                image: str = image.attrs['src']
-            else:
-                image = image.attrs['data-src']
-            cover = image.replace("/news/200/", "/news/800/")
-            return_list.append((title.text, link, cover))
-
-        return return_list
+        list_container = r.html.find("h3")
+        news_list: [str, str, str] = []
+        for l in list_container:
+            link = l.find("a", first=True)
+            if link:
+                news_list.append((link.text, link.absolute_links.pop(), None))
+        return news_list
 
 
 async def main():
