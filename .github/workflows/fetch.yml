@@ -1,6 +1,8 @@
 name: Fetch news
 
 on:
+  push:
+    branches: [master]
   schedule:
     - cron:  '*/75 * * * *'
 
