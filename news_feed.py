@@ -10,26 +10,20 @@ sleep_time = 1800
 
 
 async def main():
-    while True:
-        last_updated = 0
+    print("Start fetching")
+    bbc = BBCChinese.main()
+    gamer = GamerSky.main()
+    nyc = NYChinese.main()
+    yahooHK = YahooHK.main()
+    gnn = GNNNews.main()
+    theverge = Theverge.main()
+    yahooTW = YahooTW.main()
+    reuters = Reuters.main()
+    # wuhan = Wuhan.main()
+    await asyncio.gather(nyc, bbc, gamer, yahooHK)
+    await asyncio.gather(gnn, theverge, yahooTW, reuters)
 
-        if time.time() - last_updated > sleep_time:
-            print("Start fetching")
-            last_updated = time.time()
-            bbc = BBCChinese.main()
-            gamer = GamerSky.main()
-            nyc = NYChinese.main()
-            yahooHK = YahooHK.main()
-            gnn = GNNNews.main()
-            theverge = Theverge.main()
-            yahooTW = YahooTW.main()
-            reuters = Reuters.main()
-            # wuhan = Wuhan.main()
-            await asyncio.gather(nyc, bbc, gamer, yahooHK)
-            await asyncio.gather(gnn, theverge, yahooTW, reuters)
-
-            print("Updated at", datetime.datetime.now())
-            time.sleep(sleep_time)
+    print("Updated at", datetime.datetime.now())
 
 
 def main_sync():

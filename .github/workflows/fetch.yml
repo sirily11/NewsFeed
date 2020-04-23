@@ -1,0 +1,27 @@
+name: Fetch news
+
+on:
+  push:
+    branches: [master]
+  schedule:
+    - cron:  '*/75 * * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - uses: dschep/install-pipenv-action@v1
+      - name: Pipenv install
+        run: |
+          pipenv install
+      - name: Fetch
+        env:
+          news-feed-username: ${{ secrets.username }}
+          news-feed-password: ${{ secrets.password }}
+        run: |
+          pipenv run python news_feed.py async
