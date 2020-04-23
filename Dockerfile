@@ -9,6 +9,7 @@ RUN pip install hanziconv
 RUN pip install jieba
 RUN pip install requests-html
 RUN pip install PyVirtualDisplay
+RUN pip install tinydb
 WORKDIR /home/NewsFeed
 COPY pyppeteer pyppeteer
 WORKDIR /home/NewsFeed/pyppeteer

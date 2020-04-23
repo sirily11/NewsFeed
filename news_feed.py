@@ -33,14 +33,11 @@ async def main():
 
 
 def main_sync():
-    while True:
-        last_updated = 0
-        if time.time() - last_updated > sleep_time:
-            print("Start fetching")
-            last_updated = time.time()
-            cnn = Cnn.main()
-            print("Updated at", datetime.datetime.now())
-            time.sleep(sleep_time)
+    print("Start fetching")
+    last_updated = time.time()
+    cnn = Cnn.main()
+    print("Updated at", datetime.datetime.now())
+    time.sleep(sleep_time)
 
 
 if __name__ == '__main__':
