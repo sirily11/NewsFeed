@@ -28,10 +28,8 @@ async def main():
 
 def main_sync():
     print("Start fetching")
-    last_updated = time.time()
     cnn = Cnn.main()
     print("Updated at", datetime.datetime.now())
-    time.sleep(sleep_time)
 
 
 if __name__ == '__main__':

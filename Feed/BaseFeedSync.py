@@ -1,3 +1,6 @@
+from concurrent.futures.thread import ThreadPoolExecutor
+from threading import Thread
+
 from Feed.BaseFeed import BaseFeed
 from Feed.BaseNews import BaseNews
 from Parser.BaseParser import BaseParser
@@ -9,12 +12,14 @@ from Sentiment.Sentiment import Sentiment
 from Feed.stopwords import stop_words
 from tqdm import tqdm
 import os
+
 try:
     import jieba
 except Exception as e:
     pass
 
 import collections
+
 username = os.getenv("news-feed-username")
 password = os.getenv("news-feed-password")
 
@@ -41,7 +46,13 @@ class BaseFeedSync(BaseFeed):
         Call this method for fetching
         :return:
         """
-        news_list = self.fetch_list()
+
+        news_list: List = self.fetch_list()
+        # num_chunk = 8
+        # chunk_list = [news_list[i:i + num_chunk] for i in range(0, len(news_list), num_chunk)]
+        self.partial_fetch(news_list)
+
+    def partial_fetch(self, news_list: List):
         for news in tqdm(news_list, desc=self.display_name):
             title, link, cover = news
             if not cover:
