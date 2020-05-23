@@ -59,7 +59,12 @@ class NYChinese(BaseFeed):
 async def main():
     try:
         nyc = NYChinese()
-        await nyc.fetch_feed()
-        await nyc.upload()
+        title, content, pure = await nyc.fetch("https://cn.nytimes.com/china/20200522/china-hong-kong-national-security-law/")
+        print(content)
+        # await nyc.fetch_feed()
+        # await nyc.upload()
     except Exception as e:
         print(e)
+
+if __name__ == '__main__':
+    asyncio.run(main())
