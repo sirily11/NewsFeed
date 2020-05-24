@@ -113,7 +113,7 @@ class BaseFeed:
         :return:
         """
         words = jieba.lcut(pure_text)
-        url = "https://qbiv28lfa0.execute-api.us-east-1.amazonaws.com/dev/news-feed/keyword/"
+        url = "https://api.sirileepage.com/news-feed/keyword/"
 
         new_keywords = self.filter_keywords(words)
 
@@ -175,8 +175,8 @@ class BaseFeed:
         #             n = self.news[i]
         #             n.sentiment = s['score']
         try:
-            url = "https://qbiv28lfa0.execute-api.us-east-1.amazonaws.com/dev/news-feed/news/"
-            auth = requests.post("https://qbiv28lfa0.execute-api.us-east-1.amazonaws.com/dev/api/token/",
+            url = "https://api.sirileepage.com/news-feed/news/"
+            auth = requests.post("https://api.sirileepage.com/api/token/",
                                  {"username": username, "password": password})
             await asyncio.sleep(2)
             res = None

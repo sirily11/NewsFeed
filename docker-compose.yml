@@ -1,15 +1,8 @@
 version: '3.0'
-
 services:
-  news_feed_sync:
+  sync:
     build: ./
     container_name: news_feed
-    command: "python news_feed.py sync"
-    volumes:
-      - ./:/home/NewsFeed
-  news_feed_async:
-    build: ./
-    container_name: news_feed
-    command: "python news_feed.py async"
+    command: "python3 news_feed.py sync"
     volumes:
       - ./:/home/NewsFeed

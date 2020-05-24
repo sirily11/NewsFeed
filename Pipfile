@@ -20,6 +20,7 @@ tinydb = "*"
 quart = "*"
 pyvirtualdisplay = "*"
 flask-paginate = "*"
+selenium = "*"
 
 [requires]
 python_version = "3.7"
