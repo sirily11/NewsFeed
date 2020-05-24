@@ -16,6 +16,9 @@ jobs:
         with:
           python-version: 3.7
       - uses: dschep/install-pipenv-action@v1
+      - name: Install firefox driver
+        run: |
+          brew install geckodriver
       - name: Pipenv install
         run: |
           pipenv install
