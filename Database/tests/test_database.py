@@ -8,7 +8,7 @@ class DatabaseTest(TestCase):
         self.database = DatabaseProvider(feed_id=1)
 
     def tearDown(self):
-        self.database.db.purge_tables()
+        self.database.db.drop_tables()
 
     def test_add_logs(self):
         self.database.add_log(msg="New log1")
