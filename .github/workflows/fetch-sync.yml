@@ -27,4 +27,4 @@ jobs:
           news-feed-username: ${{ secrets.username }}
           news-feed-password: ${{ secrets.password }}
         run: |
-          pipenv run python news_feed.py sync
+          pipenv run python news_feed.py javascript
