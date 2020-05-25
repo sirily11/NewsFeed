@@ -71,6 +71,8 @@ class BBCChinese(BaseFeed):
 async def main():
     try:
         bbc = BBCChinese()
+        # content, pure, cover = await bbc.fetch("https://www.bbc.com/zhongwen/simp/chinese-news-49492516")
+        # print(content)
         await bbc.fetch_feed()
         await bbc.upload()
     except Exception as e:
