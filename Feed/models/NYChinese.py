@@ -62,7 +62,7 @@ class NYChinese(BaseFeed):
 async def main():
     try:
         nyc = NYChinese()
-        # content, pure, cover = await nyc.fetch("https://cn.nytimes.com/china/20190723/hong-kong-protest-mob-attack-yuen-long/")
+        # content, pure, cover = await nyc.fetch("https://www.bbc.com/zhongwen/simp/chinese-news-49239215")
         # print(content)
         await nyc.fetch_feed()
         await nyc.upload()

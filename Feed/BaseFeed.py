@@ -1,6 +1,6 @@
 from Feed.BaseNews import BaseNews
 from Parser.BaseParser import BaseParser
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Dict
 import requests
 import asyncio
 import json
@@ -105,25 +105,19 @@ class BaseFeed:
         self.database_provider.update_progress(progress=100, is_finished=True)
         self.database_provider.add_log("Success fetch the feed")
 
-    async def upload_keyword(self, pure_text: str, obj_id: int):
+    def get_keywords(self, pure_text: str):
         """
-        Upload keyword to the server
+        Get keywords for feed
         :param pure_text: Text
-        :param obj_id: News's id
         :return:
         """
+        if not pure_text:
+            return []
         words = jieba.lcut(pure_text)
-        url = "https://api.sirileepage.com/news-feed/keyword/"
-
         new_keywords = self.filter_keywords(words)
-
         dup = [(k, count) for k, count, in collections.Counter(new_keywords).items() if count > 1]
         dup.sort(key=lambda tup: tup[1], reverse=True)
-        data = [{"feed": obj_id, "keyword": k} for k, c in dup]
-        res = requests.post(url, json=data[:5])
-        if res.status_code != 201:
-            print(res.json())
-        await asyncio.sleep(1)
+        return [d for d, c in dup][: 5]
 
     @staticmethod
     def filter_keywords(words):
@@ -142,24 +136,17 @@ class BaseFeed:
                 keywords.append(w)
         return keywords
 
-    async def upload_item(self, obj: BaseNews, url: str, header):
+    async def perform_upload(self, objects: List[Dict], header: Dict, url: str):
         """
-        Upload single Item
-        :param obj: Upload object
-        :param url: Upload URL
-        :param header: Auth Header. Use this to login the system
+        Perform upload
+        :param url: upload url
+        :param header: upload header
+        :param objects: list of news feed
         :return:
         """
-        submit_object = obj.to_json()
-        submit_object['publisher'] = self.news_publisher
-        res = requests.post(url, json=submit_object, headers=header)
-        await asyncio.sleep(1)
-        self.written_list.append(obj.link)
+        res = requests.post(url, json=objects, headers=header)
         if res.status_code != 201:
             print(res.json())
-            return
-        if obj.pure_text:
-            await self.upload_keyword(obj.pure_text, res.json()['id'])
 
     async def upload(self):
         """"
@@ -175,16 +162,28 @@ class BaseFeed:
         #             n = self.news[i]
         #             n.sentiment = s['score']
         try:
-            url = "https://api.sirileepage.com/news-feed/news/"
+            url = "https://api.sirileepage.com/news-feed/news/?multiple"
             auth = requests.post("https://api.sirileepage.com/api/token/",
                                  {"username": username, "password": password})
             await asyncio.sleep(2)
             res = None
+            # header
             hed = {'Authorization': 'Bearer ' + auth.json()['access']}
+            # update database progress
             self.database_provider.update_upload_progress(progress=0, is_finished=False)
+            # list of news feeds
+            submit_objects = []
             for i, n in enumerate(self.news):
-                res = await self.upload_item(obj=n, url=url, header=hed)
+                # get keywords for feed
+                keywords = self.get_keywords(n.pure_text)
+                n.keywords = keywords
+                # append feed to the submission list
+                obj = n.to_json()
+                obj['publisher'] = self.news_publisher
+                submit_objects.append(obj)
                 self.database_provider.update_upload_progress(progress=(i / len(self.news)) * 100, is_finished=False)
+
+            await self.perform_upload(submit_objects, hed, url)
             self.database_provider.update_upload_progress(progress=100, is_finished=True)
             with open(f"written-{self.news_publisher}.json", 'w') as f:
                 json.dump(self.written_list, f, ensure_ascii=False)
