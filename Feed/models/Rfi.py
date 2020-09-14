@@ -3,14 +3,13 @@ from Feed.BaseNews import BaseNews
 from typing import List, Optional, Any, Union, Tuple
 from requests_html import AsyncHTMLSession, HTMLResponse, HTMLSession
 import asyncio
-import json
-from tqdm import tqdm
-from hanziconv import HanziConv
+from Parser.BaseConverterWithOnlyP import BaseConverterWithOnlyP
+from Parser.BaseParser import BaseParser
 
 
 class Rfi(BaseFeed):
     def __init__(self):
-        super().__init__()
+        super().__init__(parser=BaseParser(converter=BaseConverterWithOnlyP()))
         self.news_publisher = 13
         self.display_name = "Rfi CN"
         self.__init_written_list__()
@@ -21,8 +20,7 @@ class Rfi(BaseFeed):
             from os.path import join
             from pyquery import PyQuery as pq
             session = AsyncHTMLSession()
-            url = 'https://www.rfi.fr/cn/中国/20200914-庆功表彰遗忘-北京还在封锁真相'
-            content = await session.get(url)
+            content = await session.get(link)
             content.encoding = 'utf-8'
             cover = None
             cover_container = content.html.find('.m-figure__img', first=True)
@@ -43,6 +41,7 @@ class Rfi(BaseFeed):
             for c in contents:
                 if len(c.classes) == 0:
                     new_contents += f'<p>{c.text_content()}</p>'
+                    new_contents += '<br/>'
 
             self.parser.parse(new_contents)
             return self.parser.convert(), str(self.parser), cover
