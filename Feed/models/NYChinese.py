@@ -20,7 +20,10 @@ class NYChinese(BaseFeed):
             session = AsyncHTMLSession()
             r = await session.get(link)
             cover = r.html.find(".article-span-photo",
-                                first=True).find("img", first=True).attrs['src']
+                                first=True)
+            if cover:
+                cover = cover.find("img", first=True)
+                cover = cover.attrs['src']
             body = r.html.find(".article-body", first=True)
             contents = body.find(".article-paragraph")
             content = ""
@@ -59,7 +62,12 @@ class NYChinese(BaseFeed):
 async def main():
     try:
         nyc = NYChinese()
+        # content, pure, cover = await nyc.fetch("https://www.bbc.com/zhongwen/simp/chinese-news-49239215")
+        # print(content)
         await nyc.fetch_feed()
         await nyc.upload()
     except Exception as e:
         print(e)
+
+if __name__ == '__main__':
+    asyncio.run(main())

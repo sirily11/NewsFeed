@@ -164,3 +164,13 @@ class MultilevelParserTest(TestCase):
         self.assertEqual(len(self.parser.parsed_objects[0].children), 2)
         self.assertEqual(
             self.parser.parsed_objects[0].children[0].tag, "image")
+
+    def test_parse_with_link_and_text(self):
+        html = """<div>
+            <div><span>然而，在几年时间里，<a href="https://cn.nytimes.com/china/20190701/c01hongkong-promise/" title="Link: https://cn.nytimes.com/china/20190701/c01hongkong-promise/">中国开始采取一些措施，侵蚀香港750万居民享有的自由</a>，这些举措日益引发了支持民主的示威活动，并且令人们</span>对北京中共当局的意图产生怀疑。<div>
+            <div><span>然而，在几年时间里，<a href="https://cn.nytimes.com/china/20190701/c01hongkong-promise/" title="Link: https://cn.nytimes.com/china/20190701/c01hongkong-promise/">中国开始采取一些措施，侵蚀香港750万居民享有的自由</a>，这些举措日益引发了支持民主的示威活动，并且令人们</span>对北京中共当局的意图产生怀疑。<div>
+        </div>
+        """
+        self.parser.parse(html)
+        self.assertEqual(len(self.parser.parsed_objects), 1)
+        self.assertTrue(self.parser.parsed_objects[0].newline)

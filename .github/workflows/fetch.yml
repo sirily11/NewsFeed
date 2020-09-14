@@ -2,7 +2,7 @@ name: Fetch news
 
 on:
   schedule:
-    - cron:  '*/90 * * * *'
+    - cron:  '*/120 * * * *'
 
 jobs:
   build:

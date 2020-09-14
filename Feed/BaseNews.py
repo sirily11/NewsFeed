@@ -1,4 +1,6 @@
 import json
+from typing import List
+
 
 
 class BaseNews:
@@ -10,12 +12,14 @@ class BaseNews:
         self.sentiment = None
         self.pure_text = pure_text
         self.data = data
+        self.keywords: List[str] = []
 
     def to_json(self):
         return {"title": self.title, "content": self.content,
                 "cover": self.cover, "link": self.link,
                 "data": json.dumps(self.data, ensure_ascii=False),
-                "sentiment": self.sentiment}
+                "sentiment": self.sentiment,
+                "keywords": self.keywords}
 
     def __str__(self):
         return self.title

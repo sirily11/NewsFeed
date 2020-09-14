@@ -22,8 +22,8 @@ class DatabaseProvider:
         Delete upload progress and fetching progress
         :return:
         """
-        self.db.purge_table('progress')
-        self.db.purge_table('upload_progress')
+        self.db.drop_table('progress')
+        self.db.drop_table('upload_progress')
 
     def update_progress(self, progress: float, is_finished: bool):
         """

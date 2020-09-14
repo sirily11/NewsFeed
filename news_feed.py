@@ -10,7 +10,6 @@ sleep_time = 1800
 
 
 async def main():
-    print("Start fetching")
     bbc = BBCChinese.main()
     gamer = GamerSky.main()
     nyc = NYChinese.main()
@@ -28,23 +27,17 @@ async def main():
     print("Updated at", datetime.datetime.now())
 
 
-def main_sync():
-    while True:
-        last_updated = 0
-        if time.time() - last_updated > sleep_time:
-            print("Start fetching")
-            last_updated = time.time()
-            cnn = Cnn.main()
-            print("Updated at", datetime.datetime.now())
-            time.sleep(sleep_time)
+async def javascript_main():
+    cnn = Cnn.main()
+    await asyncio.gather(cnn)
 
 
 if __name__ == '__main__':
     if len(sys.argv) == 2:
-        if sys.argv[1] == "sync":
-            main_sync()
+        if sys.argv[1] == "javascript":
+            asyncio.run(javascript_main())
         elif sys.argv[1] == "async":
             asyncio.run(main())
     else:
         asyncio.run(main())
-        main_sync()
+        javascript_main()

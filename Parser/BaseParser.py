@@ -20,10 +20,9 @@ class BaseParser:
         """
         d = PyQuery(content)
         element_list = []
-        # if len(d.children()) == 0:
-        #     element_list.append(self.__parse__(d[0]))
-
+        # list of children
         children = d.contents()
+        # if no children, parse first one
         if len(d.children()) == 0:
             element_list.append(self.__parse__(d[0]))
         else:
@@ -69,8 +68,10 @@ class BaseParser:
         if child is not PyQuery:
             child = PyQuery(child)
 
-        if self.__is_(child, ["div", "p", "span", "label", "figure", "em"]):
-            return self.__parse_content___(child.text(), children=children_list)
+        if self.__is_(child, ["p", "span", "label", "figure", "em"]):
+            return self.__parse_content___(child.text(), children=children_list, newline=False)
+        elif self.__is_(child, ["div"]):
+            return self.__parse_content___(child.text(), children=children_list, newline=True)
         elif self.__is_(child, ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']):
             return self.__parse_header__(content=child.text(),
                                          level=int(self.__get_level__(child)),
@@ -122,12 +123,12 @@ class BaseParser:
         return ParsedObject(tag="image", content=content, children=children)
 
     @staticmethod
-    def __parse_content___(content, children) -> ParsedObject:
+    def __parse_content___(content, children, newline=False) -> ParsedObject:
         """
         Parse content tags. <p/>, </span>, <div/>
         :return:
         """
-        return ParsedObject(tag="content", content=content, children=children)
+        return ParsedObject(tag="content", content=content, children=children, newline=newline)
 
     @staticmethod
     def __parse_list___(content, children) -> ParsedObject:

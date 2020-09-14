@@ -1,31 +1,31 @@
 from typing import List
-# import pyppdf.patch_pyppeteer
+from selenium.webdriver.firefox.options import Options
+from selenium import webdriver
+from selenium.webdriver.firefox.webelement import FirefoxWebElement
 
-from Feed.BaseFeedSync import BaseFeedSync
+from Feed.BaseFeedJavaScript import BaseFeedJavaScript
 from typing import List, Optional, Any, Union, Tuple
 from requests_html import AsyncHTMLSession, HTMLResponse, HTMLSession, Element
 import asyncio
 import time
+from os import path
 
 
-class CNN(BaseFeedSync):
+class CNN(BaseFeedJavaScript):
     def __init__(self):
         super().__init__()
         self.news_publisher = 2
         self.display_name = "CNN"
         self.__init_written_list__()
 
-    def fetch(self, link: str) -> Optional[Tuple]:
-        session = HTMLSession()
+    async def fetch(self, link) -> Optional[Tuple]:
+        session = AsyncHTMLSession()
         try:
-            r = session.get(link)
-            r.html.render()
-            session.close()
+            r = await session.get(link)
             container = r.html.find(".zn-body-text", first=True)
             contents: List[Element] = container.find()
             html = ""
             cover = None
-
             for content in contents:
                 element_class = content.attrs.get('class')
                 if element_class:
@@ -45,34 +45,38 @@ class CNN(BaseFeedSync):
             self.parser.parse(html)
             return self.parser.convert(), str(self.parser), cover
         except Exception as e:
-            session.close()
             print(e)
             return None, None, None
 
-    def fetch_list(self) -> List[Tuple[str, str, Optional[str]]]:
-        session = HTMLSession()
+    async def fetch_list(self) -> List[Tuple[str, str, Optional[str]]]:
+        browser = self.get_browser()
         try:
-            r = session.get("https://www.cnn.com/")
-            r.html.render()
-            session.close()
+            url = "https://www.cnn.com/"
+            browser.get(url)
             news_list = []
-            articles = r.html.find("article")
+            articles = browser.find_elements_by_tag_name("article")
             for article in articles:
-                link = article.find("a", first=True)
-                if link:
-                    if link.text != "":
-                        news_list.append((link.text, link.absolute_links.pop(), None))
+                article: FirefoxWebElement
+                try:
+                    link = article.find_element_by_tag_name("a")
+                    if link:
+                        if link.text != "":
+                            absolute_link = link.get_attribute("href")
+                            news_list.append((link.text, absolute_link, None))
+                except Exception as e:
+                    pass
             return news_list
         except Exception as e:
-            session.close()
             print(e)
+        finally:
+            browser.close()
 
 
-def main():
+async def main():
     cnn = CNN()
-    cnn.fetch_feed()
-    cnn.upload()
+    await cnn.fetch_feed()
+    await cnn.upload()
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
