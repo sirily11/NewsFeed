@@ -1,5 +1,6 @@
 import json
 
+
 class BaseNews:
     def __init__(self, title: str, link: str, cover: str = None, content="", pure_text="", data=None):
         self.title = title

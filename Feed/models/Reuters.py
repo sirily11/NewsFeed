@@ -19,7 +19,7 @@ class Reuters(BaseFeed):
         try:
             session = AsyncHTMLSession()
             r = await session.get(link)
-            container = r.html.find(".StandardArticleBody_body", first=True)
+            container = r.html.find(".ArticleBodyWrapper", first=True)
             children = container.find()
             text = []
             html = ""
