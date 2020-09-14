@@ -10,6 +10,8 @@ sleep_time = 1800
 
 
 async def main():
+    print('Version: 1.0')
+    print("Number of news providers: 10")
     bbc = BBCChinese.main()
     gamer = GamerSky.main()
     nyc = NYChinese.main()
