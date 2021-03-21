@@ -2,7 +2,7 @@ from Feed.BaseFeed import BaseFeed
 from typing import List, Optional, Any, Union, Tuple
 from requests_html import AsyncHTMLSession, HTMLResponse, HTMLSession
 import asyncio
-
+from pyquery import PyQuery as pq
 
 class BBCChinese(BaseFeed):
     def __init__(self):
@@ -15,45 +15,53 @@ class BBCChinese(BaseFeed):
         try:
             session = AsyncHTMLSession()
             r = await session.get(link)
-            body = r.html.find(".story-body__inner", first=True)
-            if not body:
-                body = r.html.find(".story-body", first=True)
-                self.parser.parse(body.html)
-                return self.parser.convert(), str(self.parser), None
-
+            body = r.html.find("main", first=True)
+            children = body.find("div")
             texts = []
             images = []
-            html = ""
-            children = body.find()
-            first_line = body.find(".story-body__introduction", first=True)
-            cover = body.find(".js-image-replace", first=True)
-            # Get html
-            if cover:
-                html += cover.html
-            if first_line:
-                html += first_line.html
-                texts.append(first_line.text)
+            htmls = ""
 
             for c in children[1:]:
                 inner_text = c.text
-                if c.tag == "script":
-                    continue
                 if inner_text not in texts:
-                    if "class" in c.attrs:
-                        text_class = c.attrs['class']
-                        if "js-delayed-image-load" in text_class and c.attrs['data-src'] not in images:
-                            images.append(c.attrs['data-src'])
-                            html += f"<img src={c.attrs['data-src']} />"
-                    else:
-                        texts.append(inner_text)
-                        html += c.html
-            self.parser.parse(content=html)
-            if cover:
-                return self.parser.convert(), str(self.parser), cover.attrs['src']
-            else:
-                return self.parser.convert(), str(self.parser), None
+                    texts.append(inner_text)
+                    element = pq(c.raw_html)
+
+                    image = element.find("img")
+                    content = element.find("p")
+                    h1 = element.find("h1")
+                    h2 = element.find("h2")
+                    h3 = element.find("h3")
+                    h4 = element.find("h4")
+                    figcaption = element.find("figcaption")
+
+                    if image:
+                        src = pq(image).attr("src")
+                        if src not in images:
+                            images.append(src)
+                            htmls += f"<img src='{src}'/>"
+                    elif figcaption:
+                        content = pq(figcaption).find("p")
+                        htmls += str(content)
+                    elif content:
+                        htmls += str(content)
+
+                    elif h1:
+                        htmls += str(h1)
+                    elif h2:
+                        htmls += str(h2)
+
+                    elif h3:
+                        htmls += str(h3)
+
+                    elif h4:
+                        htmls += str(h4)
+
+            self.parser.parse(content=htmls)
+
+            return self.parser.convert(), str(self.parser), images[0] if len(images) > 0 else None
         except Exception as e:
-            # print(e)
+            print(e)
             return None, None, None
 
     async def fetch_list(self) -> List[Tuple[str, str, None]]:
@@ -71,9 +79,10 @@ class BBCChinese(BaseFeed):
 async def main():
     try:
         bbc = BBCChinese()
-        # content, pure, cover = await bbc.fetch("https://www.bbc.com/zhongwen/simp/chinese-news-49317370")
+        # content, pure, cover = await bbc.fetch("https://www.bbc.com/zhongwen/simp/56348346")
         await bbc.fetch_feed()
         await bbc.upload()
+        # print(content)
     except Exception as e:
         print(e)
 

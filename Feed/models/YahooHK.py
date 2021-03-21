@@ -19,20 +19,11 @@ class YahooHK(BaseFeed):
         try:
             session = AsyncHTMLSession()
             r = await session.get(link)
-            body2 = r.html.find(".canvas-body", first=True)
-            cover_container = r.html.find(".canvas-image", first=True)
-            cover = None
-            if cover_container:
-                cover = cover_container.find("img", first=True)
-                if cover:
-                    cover = cover.attrs['src']
+            body = r.html.find(".caas-body", first=True)
+            cover = body.find(".caas-img", first=True)
+            cover = cover.attrs['data-src'] if cover else None
+            html = body.text
 
-            eles = body2.find()
-            html = f"<img src='{cover}' />"
-
-            for e in eles:
-                if e.tag == "p":
-                    html += f"<p>{e.text}</p>"
             self.parser.parse(html)
             return HanziConv.toSimplified(self.parser.convert()), HanziConv.toSimplified(str(self.parser)), cover
         except Exception as e:
